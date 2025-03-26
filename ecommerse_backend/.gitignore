@@ -1,0 +1,17 @@
+# Backend - Node/Express
+node_modules/
+.env
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Optional: ignore uploads if you store images locally
+uploads/
+temp/
+tmp/
+
+# VS Code and OS files
+.DS_Store
+.vscode/
