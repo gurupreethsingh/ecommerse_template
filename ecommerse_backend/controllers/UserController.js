@@ -1,90 +1,375 @@
-// functions. 
-const User = require("../models/UserModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const User = require("../models/UserModel");
+const fs = require("fs");
+const path = require("path");
+const multer = require("multer");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
-// registering a new user , into the application code is working perfectly fine.
-const register = async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
-      // Check if the user already exists
-      let user = await User.findOne({ email });
-      if (user) {
-        return res.status(400).json({ msg: "User already exists" });
-      }
-  
-      // Create a new user
-      user = new User({
-        name,
-        email,
-        password,
-      });
-  
-      // Hash the password
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(password, salt);
-  
-      // Save the user to the database
-      await user.save();
-  
-      res.status(201).json({ msg: "User registered successfully" });
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).send("Server error");
-    }
+// ----------------------------
+// HELPER TO SEND EMAIL
+// ----------------------------
+const sendEmail = (email, subject, message) => {
+  const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: email,
+    subject: subject,
+    text: message,
   };
 
-  const login = async (req, res) => {
-    try {
-      const { email, password } = req.body;
-  
-      // Check if both fields are provided
-      if (!email || !password) {
-        return res.status(400).json({ message: "All Fields Are Required." });
-      }
-  
-      // Check if the user exists
-      const user = await User.findOne({ email });
-  
-      if (!user) {
-        return res.status(400).json({ message: "User not found." });
-      }
-  
-      // Compare passwords
-      const isPasswordCorrect = await bcrypt.compare(password, user.password);
-  
-      if (!isPasswordCorrect) {
-        return res.status(400).json({ message: "Invalid credentials." });
-      }
-  
-      // If password is correct, generate token
-      const token = jwt.sign(
-        {
-          id: user._id,
-          name: user.name,
-          role: user.role,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-      );
-  
-      // Send successful response
-      return res.status(200).json({
-        message: "User login successful",
-        token,
-        user: {
-          id: user._id,
-          name: user.name,
-          role: user.role,
-        }
-      });
-    } catch (error) {
-      console.error("Login error:", error.message);
-      return res.status(500).send("Server error");
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.error("Failed to send email:", err);
+    } else {
+      console.log("Email sent successfully:", info.response);
     }
-  };
-  
+  });
+};
 
-  module.exports = {
-    register, login
+// ----------------------------
+// Function to send SMS
+// ----------------------------
+const sendSMS = async (phone, message) => {
+  try {
+    const sms = await client.messages.create({
+      body: message,
+      from: process.env.TWILIO_PHONE_NUMBER, // Twilio number
+      to: phone, // Recipient's phone number
+    });
+    console.log("SMS sent with SID: " + sms.sid);
+  } catch (error) {
+    console.error("Error sending SMS:", error.message);
   }
+};
+
+// ----------------------------
+// MULTER STORAGE CONFIG
+// ----------------------------
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const role = req.body.role || "user";
+    const dir = path.join("uploads", role);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    cb(null, dir);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
+// ----------------------------
+// CONTROLLERS
+// ----------------------------
+
+// Register
+const register = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser)
+      return res.status(400).json({ message: "User already exists" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    res.status(201).json({ message: "User registered successfully" });
+  } catch (error) {
+    console.error("Register Error:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Login
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password)
+      return res.status(400).json({ message: "All fields required" });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "User not found" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid credentials" });
+
+    const token = jwt.sign(
+      { id: user._id, name: user.name, role: user.role },
+      process.env.JWT_SECRET || "ecoders_jwt_secret",
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: { id: user._id, name: user.name, role: user.role },
+    });
+  } catch (err) {
+    console.error("Login Error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get user by ID
+const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json(user);
+  } catch (err) {
+    console.error("Fetch Error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Update profile
+// Update user details
+const updateUser = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      phone,
+      address,
+      companyName,
+      companyAddress,
+      companyEmail,
+      gstNumber,
+      promotionalConsent,
+    } = req.body;
+    const user = await User.findById(req.params.id);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Update user fields
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (phone) user.phone = phone;
+    if (address) user.address = { ...user.address, ...JSON.parse(address) };
+    if (companyName) user.companyName = companyName;
+    if (companyAddress) user.companyAddress = companyAddress;
+    if (companyEmail) user.companyEmail = companyEmail;
+    if (gstNumber) user.gstNumber = gstNumber;
+    if (promotionalConsent !== undefined)
+      user.promotionalConsent = promotionalConsent;
+
+    if (req.file) {
+      const newAvatarPath = `uploads/${user.role}/${req.file.filename}`;
+      if (user.avatar) {
+        const oldAvatarPath = path.join(__dirname, "..", user.avatar);
+        if (fs.existsSync(oldAvatarPath)) fs.unlinkSync(oldAvatarPath);
+      }
+      user.avatar = newAvatarPath;
+    }
+
+    await user.save();
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error updating user:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Delete user
+const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user.avatar) {
+      const imagePath = path.join(__dirname, "..", user.avatar);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (err) {
+    console.error("Delete Error:", err.message);
+    res.status(500).json({ message: "Failed to delete user" });
+  }
+};
+
+// Count users
+const getUserCounts = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const admins = await User.countDocuments({ role: "admin" });
+    const superadmins = await User.countDocuments({ role: "superadmin" });
+    const customers = await User.countDocuments({ role: "user" });
+
+    res.status(200).json({
+      totalUsers,
+      admins,
+      superadmins,
+      customers,
+    });
+  } catch (err) {
+    console.error("Count Error:", err.message);
+    res.status(500).json({ message: "Failed to fetch counts" });
+  }
+};
+
+// Get all users
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+    res.status(200).json(users);
+  } catch (err) {
+    console.error("Fetch All Users Error:", err.message);
+    res.status(500).json({ message: "Failed to fetch users" });
+  }
+};
+
+// Forgot Password - Send OTP
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "User not found" });
+
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const otpExpires = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+
+    await User.findOneAndUpdate({ email }, { $set: { otp, otpExpires } });
+
+    sendEmail(
+      email,
+      "Password Reset OTP",
+      `Your OTP is ${otp}. It expires in 10 minutes.`
+    );
+
+    res.status(200).json({ message: "OTP sent to email" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Verify OTP
+const verifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const user = await User.findOne({ email, otp });
+    if (!user || user.otpExpires < Date.now()) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "OTP verified. Proceed to reset password." });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Reset Password (altered code )
+const resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    console.log("Reset Password Request Received:");
+    console.log("Email:", email);
+    console.log("OTP:", otp);
+    console.log("New Password:", newPassword);
+
+    let user = await User.findOne({ email, otp });
+    console.log("User found:", user);
+
+    // Check if user exists and if OTP has not expired
+    if (!user) {
+      console.log("User not found or invalid OTP");
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    if (user.otpExpires < Date.now()) {
+      console.log("OTP expired");
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    // Hash and update the password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    console.log("Password hashed");
+
+    // Update user password and clear OTP fields
+    user.password = hashedPassword;
+    user.otp = undefined; // Correct way to clear OTP
+    user.otpExpires = undefined; // Correct way to clear OTP expiry
+
+    // Save the updated user
+    await user.save();
+    console.log("User saved with new password");
+
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    console.error("Error resetting password:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Update user role and privileges
+const updateUserRoleAndPrivileges = async (req, res) => {
+  try {
+    const { role, privileges } = req.body;
+
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Update role and privileges
+    if (role) user.role = role;
+    if (privileges) user.privileges = privileges;
+    const update_data = {};
+    const keysToUpdate = [
+      { key: "role", value: role },
+      { key: "privileges", value: privileges },
+    ];
+
+    keysToUpdate.forEach(({ key, value }) => {
+      if (value !== undefined) {
+        update_data[key] = value;
+      }
+    });
+
+    await User.findOneAndUpdate(
+      { _id: req.params.id },
+      { $set: { ...update_data } }
+    );
+    res.status(200).json({ message: "User role and privileges updated", user });
+  } catch (error) {
+    console.error("Error updating user role and privileges:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  getUserById,
+  updateUser,
+  deleteUser,
+  getUserCounts,
+  upload,
+  getAllUsers,
+  updateUserRoleAndPrivileges,
+  forgotPassword,
+  verifyOTP,
+  resetPassword,
+};

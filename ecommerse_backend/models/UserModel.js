@@ -24,10 +24,11 @@ const userSchema = new mongoose.Schema({
       "course_coordinator", // Course Coordinator
       "customer_support", // New role: Customer Support Representative
       "data_scientist", // New role: Data Scientist
-   
+
       "department_head", // Head of Department
       "developer", // Software Developer
       "event_coordinator", // Event Coordinator
+      "employee",
       "hr_manager", // HR Manager
       "intern", // Intern
       "legal_advisor", // New role: Legal Advisor
@@ -50,10 +51,12 @@ const userSchema = new mongoose.Schema({
       "ux_ui_designer", // UX/UI Designer
       "vendor",
       "outlet",
-      "delivery_person"
+      "delivery_person",
     ],
     default: "user", // Default role
   },
+  otp: { type: String },
+  otpExpires: { type: Date },
   createdAt: { type: Date, default: Date.now }, // Timestamp for record creation
   updatedAt: { type: Date, default: Date.now }, // Timestamp for last update
 });

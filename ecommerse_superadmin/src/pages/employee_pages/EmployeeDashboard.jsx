@@ -1,11 +1,10 @@
 import React from "react";
-import UserComponent from "../../components/common_components/UserComponent";
 import PageHeading from "../../components/common_components/PageHeading";
 
-const Homepage = () => {
+const EmployeeDashboard = () => {
   return (
     <div className="fullWidth">
-      <PageHeading pageTitle="Homepage" />
+      <PageHeading pageTitle="Employee Dashboard" />
       <div className="containerWidth my-6">
         <p className="paragraphTextMobile lg:paragraphText">
           Lorem, ipsum dolor sit amet consectetur adipisicing elit. Illum animi
@@ -18,4 +17,4 @@ const Homepage = () => {
   );
 };
 
-export default Homepage;
+export default EmployeeDashboard;

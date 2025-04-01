@@ -1,11 +1,18 @@
-import React from 'react'
+import React from "react";
 
-const CustomeLink = ({linkAddress, linkName}) => {
+const CustomeLink = ({ linkAddress, linkName }) => {
+  const isExternal = linkAddress.startsWith("http");
+
   return (
-    <li className="nav-item">
-    <a className="nav-link text-gray-900" aria-current="page" href={linkAddress} >{linkName}</a>
-  </li>
-  )
-}
+    <a
+      href={linkAddress}
+      className="text-sm text-white hover:text-indigo-600 transition-colors"
+      target={isExternal ? "_blank" : "_self"}
+      rel={isExternal ? "noopener noreferrer" : ""}
+    >
+      {linkName}
+    </a>
+  );
+};
 
-export default CustomeLink
+export default CustomeLink;
