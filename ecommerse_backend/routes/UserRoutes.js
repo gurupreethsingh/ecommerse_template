@@ -16,6 +16,7 @@ const {
   forgotPassword,
   verifyOTP,
   resetPassword,
+  getUserCountsByRole,
 } = require("../controllers/UserController");
 
 // Set up multer storage for handling file uploads
@@ -57,5 +58,6 @@ router.put("/update-user-role/:id", updateUserRoleAndPrivileges);
 router.post("/forgot-password", forgotPassword);
 router.post("/verify-otp", verifyOTP);
 router.post("/reset-password", resetPassword);
+router.get("/getUserCountsByRole", getUserCountsByRole);
 
 module.exports = router;

@@ -230,6 +230,29 @@ const getUserCounts = async (req, res) => {
   }
 };
 
+// get user count by the roles we have in the database. 
+// Get dynamic user counts grouped by role
+const getUserCountsByRole = async (req, res) => {
+  try {
+    const counts = await User.aggregate([
+      { $group: { _id: "$role", count: { $sum: 1 } } }
+    ]);
+
+    const totalUsers = await User.countDocuments();
+
+    const countMap = { totalUsers };
+    counts.forEach(item => {
+      countMap[item._id] = item.count;
+    });
+
+    res.status(200).json(countMap);
+  } catch (err) {
+    console.error("Dynamic count error:", err.message);
+    res.status(500).json({ message: "Failed to fetch dynamic user counts" });
+  }
+};
+
+
 // Get all users
 const getAllUsers = async (req, res) => {
   try {
@@ -372,4 +395,5 @@ module.exports = {
   forgotPassword,
   verifyOTP,
   resetPassword,
+  getUserCountsByRole,
 };
