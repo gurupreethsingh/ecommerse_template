@@ -27,6 +27,16 @@ import AllUsers from "../../pages/superadmin_pages/AllUsers";
 import SingleUser from "../../pages/superadmin_pages/SingleUser";
 import ForgotPassword from "../../pages/user_pages/ForgotPassword";
 import ResetPassword from "../../pages/user_pages/ResetPassword";
+import AddCategory from "../../pages/category_pages/AddCategory";
+import AllCategories from "../../pages/category_pages/AllCategories";
+import SingleCategory from "../../pages/category_pages/SingleCategory";
+import CategoryAllProducts from "../../pages/category_pages/CategoryAllProducts";
+import AddVendor from "../../pages/vendor_pages/AddVendor";
+import AllVendors from "../../pages/vendor_pages/AllVendors";
+import SingleVendor from "../../pages/vendor_pages/SingleVendor";
+import AddOutlet from "../../pages/outlet_pages/AddOutlet";
+import SingleOutlet from "../../pages/outlet_pages/SingleOutlet";
+import AllOutlets from "../../pages/outlet_pages/AllOutlets";
 
 const MainLayout = () => {
   return (
@@ -234,6 +244,138 @@ const MainLayout = () => {
               <PrivateRoute allowedRoles={["superadmin"]}>
                 <PageTitle title="Single User">
                   <SingleUser />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/add-category"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="Add Category">
+                  <AddCategory />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/all-categories"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="All Categories">
+                  <AllCategories />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/single-category/:id"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="Single Category">
+                  <SingleCategory />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/single-category-all-products/:id"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="Category All Products">
+                  <CategoryAllProducts />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/add-vendor"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="Add Vendor">
+                  <AddVendor />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/all-vendors"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="All Vendors">
+                  <AllVendors />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/single-vendor/:vendorId"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="Single Vendor">
+                  <SingleVendor />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/vendor-dashboard/:vendorId"
+            element={
+              <PrivateRoute allowedRoles={["superadmin", "vendor"]}>
+                <PageTitle title="Vendor Dashboard">
+                  <VendorDashboard />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/add-outlet"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="Add Outlet">
+                  <AddOutlet />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/all-outlets"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="All Outlets">
+                  <AllOutlets />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/single-outlet/:outletId"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="Single Outlet">
+                  <SingleOutlet />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/outlet-dashboard/:outletId"
+            element={
+              <PrivateRoute allowedRoles={["superadmin", "outlet"]}>
+                <PageTitle title="Outlet Dashboard">
+                  <OutletDashboard />
                 </PageTitle>
               </PrivateRoute>
             }

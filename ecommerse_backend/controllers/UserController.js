@@ -22,7 +22,7 @@ const sendEmail = (email, subject, message) => {
   const mailOptions = {
     from: process.env.EMAIL,
     to: email,
-    subject: subject,
+    subject,
     text: message,
   };
 
@@ -36,14 +36,14 @@ const sendEmail = (email, subject, message) => {
 };
 
 // ----------------------------
-// Function to send SMS
+// Function to send SMS (Twilio)
 // ----------------------------
 const sendSMS = async (phone, message) => {
   try {
     const sms = await client.messages.create({
       body: message,
-      from: process.env.TWILIO_PHONE_NUMBER, // Twilio number
-      to: phone, // Recipient's phone number
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: phone,
     });
     console.log("SMS sent with SID: " + sms.sid);
   } catch (error) {
@@ -64,7 +64,7 @@ const storage = multer.diskStorage({
     cb(null, dir);
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
+    cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
 
@@ -74,7 +74,6 @@ const upload = multer({ storage });
 // CONTROLLERS
 // ----------------------------
 
-// Register
 const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -85,7 +84,7 @@ const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({
+    await User.create({
       name,
       email,
       password: hashedPassword,
@@ -98,7 +97,6 @@ const register = async (req, res) => {
   }
 };
 
-// Login
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -129,12 +127,10 @@ const login = async (req, res) => {
   }
 };
 
-// Get user by ID
 const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
-
     res.status(200).json(user);
   } catch (err) {
     console.error("Fetch Error:", err.message);
@@ -142,8 +138,6 @@ const getUserById = async (req, res) => {
   }
 };
 
-// Update profile
-// Update user details
 const updateUser = async (req, res) => {
   try {
     const {
@@ -157,11 +151,10 @@ const updateUser = async (req, res) => {
       gstNumber,
       promotionalConsent,
     } = req.body;
-    const user = await User.findById(req.params.id);
 
+    const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Update user fields
     if (name) user.name = name;
     if (email) user.email = email;
     if (phone) user.phone = phone;
@@ -174,11 +167,17 @@ const updateUser = async (req, res) => {
       user.promotionalConsent = promotionalConsent;
 
     if (req.file) {
-      const newAvatarPath = `uploads/${user.role}/${req.file.filename}`;
+      const newAvatarPath = path
+        .join("uploads", user.role, req.file.filename)
+        .replace(/\\/g, "/");
+
       if (user.avatar) {
         const oldAvatarPath = path.join(__dirname, "..", user.avatar);
-        if (fs.existsSync(oldAvatarPath)) fs.unlinkSync(oldAvatarPath);
+        if (fs.existsSync(oldAvatarPath)) {
+          fs.unlinkSync(oldAvatarPath);
+        }
       }
+
       user.avatar = newAvatarPath;
     }
 
@@ -190,7 +189,6 @@ const updateUser = async (req, res) => {
   }
 };
 
-// Delete user
 const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
@@ -210,7 +208,6 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// Count users
 const getUserCounts = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
@@ -218,30 +215,23 @@ const getUserCounts = async (req, res) => {
     const superadmins = await User.countDocuments({ role: "superadmin" });
     const customers = await User.countDocuments({ role: "user" });
 
-    res.status(200).json({
-      totalUsers,
-      admins,
-      superadmins,
-      customers,
-    });
+    res.status(200).json({ totalUsers, admins, superadmins, customers });
   } catch (err) {
     console.error("Count Error:", err.message);
     res.status(500).json({ message: "Failed to fetch counts" });
   }
 };
 
-// get user count by the roles we have in the database. 
-// Get dynamic user counts grouped by role
 const getUserCountsByRole = async (req, res) => {
   try {
     const counts = await User.aggregate([
-      { $group: { _id: "$role", count: { $sum: 1 } } }
+      { $group: { _id: "$role", count: { $sum: 1 } } },
     ]);
 
     const totalUsers = await User.countDocuments();
-
     const countMap = { totalUsers };
-    counts.forEach(item => {
+
+    counts.forEach((item) => {
       countMap[item._id] = item.count;
     });
 
@@ -252,8 +242,6 @@ const getUserCountsByRole = async (req, res) => {
   }
 };
 
-
-// Get all users
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password");
@@ -264,7 +252,6 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-// Forgot Password - Send OTP
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -272,7 +259,7 @@ const forgotPassword = async (req, res) => {
     if (!user) return res.status(400).json({ message: "User not found" });
 
     const otp = crypto.randomInt(100000, 999999).toString();
-    const otpExpires = Date.now() + 10 * 60 * 1000; // OTP expires in 10 minutes
+    const otpExpires = Date.now() + 10 * 60 * 1000;
 
     await User.findOneAndUpdate({ email }, { $set: { otp, otpExpires } });
 
@@ -288,7 +275,6 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-// Verify OTP
 const verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -305,41 +291,21 @@ const verifyOTP = async (req, res) => {
   }
 };
 
-// Reset Password (altered code )
 const resetPassword = async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
-    console.log("Reset Password Request Received:");
-    console.log("Email:", email);
-    console.log("OTP:", otp);
-    console.log("New Password:", newPassword);
 
-    let user = await User.findOne({ email, otp });
-    console.log("User found:", user);
-
-    // Check if user exists and if OTP has not expired
-    if (!user) {
-      console.log("User not found or invalid OTP");
+    const user = await User.findOne({ email, otp });
+    if (!user || user.otpExpires < Date.now()) {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
-    if (user.otpExpires < Date.now()) {
-      console.log("OTP expired");
-      return res.status(400).json({ message: "Invalid or expired OTP" });
-    }
-
-    // Hash and update the password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    console.log("Password hashed");
-
-    // Update user password and clear OTP fields
     user.password = hashedPassword;
-    user.otp = undefined; // Correct way to clear OTP
-    user.otpExpires = undefined; // Correct way to clear OTP expiry
+    user.otp = undefined;
+    user.otpExpires = undefined;
 
-    // Save the updated user
     await user.save();
-    console.log("User saved with new password");
 
     res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
@@ -348,34 +314,25 @@ const resetPassword = async (req, res) => {
   }
 };
 
-// Update user role and privileges
 const updateUserRoleAndPrivileges = async (req, res) => {
   try {
     const { role, privileges } = req.body;
+    const updateData = {};
 
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (role) updateData.role = role;
+    if (privileges) updateData.privileges = privileges;
 
-    // Update role and privileges
-    if (role) user.role = role;
-    if (privileges) user.privileges = privileges;
-    const update_data = {};
-    const keysToUpdate = [
-      { key: "role", value: role },
-      { key: "privileges", value: privileges },
-    ];
-
-    keysToUpdate.forEach(({ key, value }) => {
-      if (value !== undefined) {
-        update_data[key] = value;
-      }
+    const updated = await User.findByIdAndUpdate(req.params.id, {
+      $set: updateData,
     });
 
-    await User.findOneAndUpdate(
-      { _id: req.params.id },
-      { $set: { ...update_data } }
-    );
-    res.status(200).json({ message: "User role and privileges updated", user });
+    if (!updated) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "User role and privileges updated", updated });
   } catch (error) {
     console.error("Error updating user role and privileges:", error.message);
     res.status(500).json({ message: "Server error" });

@@ -1,0 +1,204 @@
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import axios from "axios";
+import globalBackendRoute from "../../config/Config";
+import {
+  FaUser,
+  FaEnvelope,
+  FaPhone,
+  FaBuilding,
+  FaMapMarkerAlt,
+  FaBox,
+  FaEdit,
+} from "react-icons/fa";
+
+export default function SingleOutlet() {
+  const { outletId } = useParams();
+  const [outlet, setOutlet] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [updatedOutlet, setUpdatedOutlet] = useState({});
+
+  useEffect(() => {
+    const fetchOutletDetails = async () => {
+      try {
+        const response = await axios.get(
+          `${globalBackendRoute}/api/get-outlet-by-id/${outletId}`
+        );
+        setOutlet(response.data);
+        setUpdatedOutlet(response.data);
+      } catch (error) {
+        console.error("Error fetching outlet details:", error);
+      }
+    };
+
+    fetchOutletDetails();
+  }, [outletId]);
+
+  useEffect(() => {
+    const fetchOutletProducts = async () => {
+      try {
+        const response = await axios.get(
+          `${globalBackendRoute}/api/products-by-outlet/${outletId}`
+        );
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching outlet products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOutletProducts();
+  }, [outletId]);
+
+  const handleUpdateOutlet = async () => {
+    try {
+      await axios.put(
+        `${globalBackendRoute}/api/update-outlet/${outletId}`,
+        updatedOutlet
+      );
+      alert("Outlet updated successfully!");
+      setOutlet(updatedOutlet);
+      setEditMode(false);
+    } catch (error) {
+      console.error("Error updating outlet:", error);
+      alert("Failed to update outlet.");
+    }
+  };
+
+  const handleChange = (key, value) => {
+    setUpdatedOutlet({ ...updatedOutlet, [key]: value });
+  };
+
+  if (loading)
+    return <div className="text-center py-10">Loading outlet details...</div>;
+  if (!outlet) return <div className="text-center py-10">Outlet not found</div>;
+
+  const fields = [
+    {
+      label: "Outlet Name",
+      key: "outlet_name",
+      icon: <FaUser className="text-indigo-600 mr-2" />,
+    },
+    {
+      label: "Email",
+      key: "outlet_email",
+      icon: <FaEnvelope className="text-green-500 mr-2" />,
+    },
+    {
+      label: "Phone",
+      key: "outlet_phone",
+      icon: <FaPhone className="text-yellow-500 mr-2" />,
+    },
+    {
+      label: "Company Name",
+      key: "company_name",
+      icon: <FaBuilding className="text-blue-600 mr-2" />,
+    },
+  ];
+
+  return (
+    <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="headingTextMobile">Outlet Information</h3>
+            <Link to="/all-outlets">
+              <button className="fileUploadBtn text-xs py-1 px-3">
+                Go to All Outlets
+              </button>
+            </Link>
+          </div>
+
+          <div className="border-t border-gray-200 mt-4">
+            <dl className="divide-y divide-gray-100">
+              {fields.map((field, idx) => (
+                <div
+                  key={idx}
+                  className="px-4 py-4 sm:grid sm:grid-cols-3 sm:gap-4"
+                >
+                  <dt className="flex items-center text-sm font-medium text-gray-900">
+                    {field.icon}
+                    {field.label}
+                  </dt>
+                  <dd className="text-sm text-gray-700 sm:col-span-2 mt-1 sm:mt-0">
+                    {editMode ? (
+                      <input
+                        type="text"
+                        value={updatedOutlet[field.key] || ""}
+                        onChange={(e) =>
+                          handleChange(field.key, e.target.value)
+                        }
+                        className="formInput"
+                      />
+                    ) : (
+                      outlet[field.key]
+                    )}
+                  </dd>
+                </div>
+              ))}
+
+              <div className="px-4 py-4 flex justify-end">
+                <button
+                  onClick={() =>
+                    editMode ? handleUpdateOutlet() : setEditMode(true)
+                  }
+                  className="primaryBtn w-auto px-4 py-2"
+                >
+                  {editMode ? "Save Changes" : <FaEdit className="mr-1" />}
+                </button>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <div>
+          <h3 className="headingTextMobile mb-4">
+            Products ({products.length})
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {products.length > 0 ? (
+              products.map((product, index) => (
+                <div
+                  key={product._id || index}
+                  className={`rounded-lg shadow p-4 flex flex-col items-center text-center ${
+                    product.stock <= 5
+                      ? "bg-red-500 text-white animate-pulse"
+                      : product.stock <= 20
+                      ? "bg-yellow-300 text-gray-900"
+                      : "bg-green-200 text-gray-900"
+                  }`}
+                >
+                  {product.product_image ? (
+                    <img
+                      src={`${globalBackendRoute}/${product.product_image.replace(
+                        /\\/g,
+                        "/"
+                      )}`}
+                      alt={product.product_name}
+                      className="h-16 w-16 object-cover rounded-full mb-2"
+                    />
+                  ) : (
+                    <FaBox className="text-3xl" />
+                  )}
+                  <p className="mt-2 text-sm font-medium">
+                    {product.product_name}
+                  </p>
+                  <p className="mt-1 text-xs">
+                    Stock: {product.stock || "N/A"}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">
+                No products available for this outlet.
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

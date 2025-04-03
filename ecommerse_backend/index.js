@@ -11,6 +11,9 @@ const bcrypt = require("bcrypt");
 
 const userRoutes = require(".//routes/UserRoutes");
 const activityRoutes = require("./routes/ActivityRoutes");
+const categoryRoutes = require("./routes/CategoryRoutes");
+const outletRoutes = require("./routes/OutletRoutes");
+const vendorRoutes = require("./routes/VendorRoutes");
 
 // 2. give a name to your api backend. app = express()
 dotenv.config();
@@ -31,6 +34,9 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api", userRoutes);
 app.use("/api", activityRoutes);
+app.use("/api", categoryRoutes);
+app.use("/api", outletRoutes);
+app.use("/api", vendorRoutes);
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
