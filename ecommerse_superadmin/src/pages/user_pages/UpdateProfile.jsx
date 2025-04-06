@@ -116,7 +116,12 @@ export default function UpdateProfile() {
           <img
             src={getImageUrl(formData.avatar)}
             alt={formData.name}
-            className="w-full h-full object-cover rounded-xl border"
+            className="w-full h-full object-cover rounded-xl border bg-gray-100"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src =
+                "https://via.placeholder.com/150?text=No+Image";
+            }}
           />
         </div>
         <form onSubmit={handleSubmit} className="w-full">

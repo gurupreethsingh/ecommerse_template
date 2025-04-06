@@ -44,23 +44,91 @@ export default function AllOutlets() {
     }
   };
 
-  const displayLocation = (outlet_address) => {
-    if (!outlet_address) return "N/A";
-    const { street, city, state, zip_code, country } = outlet_address;
+  const displayLocation = (address) => {
+    if (!address) return "N/A";
+    const { street, city, state, zip_code, country } = address;
     return [street, city, state, zip_code, country].filter(Boolean).join(", ");
   };
 
-  const filteredOutlets = outlets.filter((outlet) =>
-    [
-      outlet?.outlet_name,
-      outlet?.outlet_address?.street,
-      outlet?.outlet_address?.city,
-      outlet?.outlet_address?.state,
-      outlet?.company_name,
-    ]
-      .map((field) => field?.toLowerCase() || "")
-      .some((field) => field.includes(searchQuery.toLowerCase()))
-  );
+  // ✅ Stopwords and enhanced search logic
+  const stopwords = [
+    "show",
+    "me",
+    "all",
+    "of",
+    "the",
+    "users",
+    "with",
+    "please",
+    "find",
+    "list",
+    "give",
+    "i",
+    "want",
+    "to",
+    "see",
+    "display",
+    "get",
+    "need",
+    "for",
+    "on",
+    "in",
+    "at",
+    "a",
+    "an",
+    "this",
+    "that",
+    "those",
+    "these",
+    "my",
+    "your",
+    "their",
+    "our",
+    "from",
+    "and",
+    "or",
+    "by",
+    "can",
+    "you",
+    "let",
+    "us",
+    "would",
+    "should",
+    "could",
+    "will",
+    "just",
+    "is",
+    "there",
+    "outlet",
+    "outlets",
+  ];
+
+  // Simple fuzzy match: check if any chunk of the query exists in the text
+  const fuzzyIncludes = (text, keyword) => {
+    const len = keyword.length;
+    if (len < 3) return text.includes(keyword);
+    const partial = keyword.slice(0, Math.max(3, len - 2)); // match base
+    return text.includes(partial);
+  };
+
+  const filteredOutlets = outlets.filter((outlet) => {
+    if (!searchQuery.trim()) return true;
+
+    const fullText = `${outlet.outlet_name} ${
+      outlet.company_name
+    } ${displayLocation(outlet.outlet_address)}`.toLowerCase();
+
+    const queryWords = searchQuery
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((word) => word && !stopwords.includes(word));
+
+    return queryWords.some(
+      (word) =>
+        fuzzyIncludes(fullText, word) ||
+        fuzzyIncludes(fullText, word.replace(/s$/, ""))
+    );
+  });
 
   const totalPages = Math.ceil(filteredOutlets.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -70,11 +138,22 @@ export default function AllOutlets() {
   );
 
   return (
-    <div className="bg-white py-16 sm:py-20">
+    <div className="bg-white py-10">
       <div className="containerWidth">
-        <div className="flex justify-between items-center flex-wrap">
-          <h2 className="headingText">All Outlets</h2>
-          <div className="flex items-center space-x-3 flex-wrap">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center flex-wrap gap-4">
+          <div>
+            <h2 className="headingText flex flex-wrap items-center gap-2">
+              All Outlets
+              <span className="text-sm font-normal text-gray-600">
+                (Showing {startIndex + 1}–
+                {Math.min(startIndex + itemsPerPage, filteredOutlets.length)} of{" "}
+                {filteredOutlets.length})
+              </span>
+            </h2>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
             <FaThList
               className={`text-xl cursor-pointer ${
                 view === "list" ? "text-indigo-600" : "text-gray-600"
@@ -93,11 +172,11 @@ export default function AllOutlets() {
               }`}
               onClick={() => setView("grid")}
             />
-            <div className="relative">
-              <FaSearch className="absolute left-3 top-2 text-gray-400" />
+            <div className="relative w-full sm:w-64">
+              <FaSearch className="absolute left-3 top-3 text-gray-400" />
               <input
                 type="text"
-                className="formInput pl-10 w-48"
+                className="formInput pl-10"
                 placeholder="Search outlets..."
                 value={searchQuery}
                 onChange={(e) => {
@@ -114,120 +193,121 @@ export default function AllOutlets() {
           </div>
         </div>
 
-        <div className="mt-10">
-          {view === "grid" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              {paginatedOutlets.map((outlet) => (
-                <div
-                  key={outlet._id}
-                  className="relative bg-white p-4 shadow rounded-lg"
+        {/* Grid View */}
+        {view === "grid" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mt-10">
+            {paginatedOutlets.map((outlet) => (
+              <div
+                key={outlet._id}
+                className="relative bg-white p-4 shadow rounded-lg"
+              >
+                <button
+                  onClick={() => deleteOutlet(outlet._id)}
+                  className="absolute top-2 right-2 text-red-500 hover:text-red-700"
                 >
-                  <button
-                    onClick={() => deleteOutlet(outlet._id)}
-                    className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                  >
-                    <FaTrashAlt />
-                  </button>
-                  <Link
-                    to={`/single-outlet/${outlet._id}`}
-                    className="flex flex-col items-start"
-                  >
-                    <h3 className="subHeadingTextMobile">
-                      {outlet.outlet_name || "Unknown Outlet"}
-                    </h3>
-                    <p className="paragraphTextMobile mt-2">
-                      Location: {displayLocation(outlet.outlet_address)}
-                    </p>
-                    <p className="paragraphTextMobile mt-1">
-                      Company: {outlet.company_name || "N/A"}
-                    </p>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          )}
+                  <FaTrashAlt />
+                </button>
+                <Link to={`/single-outlet/${outlet._id}`}>
+                  <h3 className="subHeadingTextMobile">
+                    {outlet.outlet_name || "Unknown Outlet"}
+                  </h3>
+                  <p className="paragraphTextMobile mt-2">
+                    Location: {displayLocation(outlet.outlet_address)}
+                  </p>
+                  <p className="paragraphTextMobile mt-1">
+                    Company: {outlet.company_name || "N/A"}
+                  </p>
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
 
-          {view === "card" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paginatedOutlets.map((outlet) => (
-                <div
-                  key={outlet._id}
-                  className="relative bg-white p-6 shadow-md rounded-lg hover:shadow-lg transition"
+        {/* Card View */}
+        {view === "card" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+            {paginatedOutlets.map((outlet) => (
+              <div
+                key={outlet._id}
+                className="relative bg-white p-6 shadow-md rounded-lg hover:shadow-lg transition"
+              >
+                <button
+                  onClick={() => deleteOutlet(outlet._id)}
+                  className="absolute top-2 right-2 text-red-500 hover:text-red-700"
                 >
-                  <button
-                    onClick={() => deleteOutlet(outlet._id)}
-                    className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                  >
-                    <FaTrashAlt />
-                  </button>
-                  <Link to={`/single-outlet/${outlet._id}`}>
-                    <h3 className="subHeadingTextMobile mb-2">
-                      {outlet.outlet_name}
-                    </h3>
-                    <p className="paragraphTextMobile">
-                      {displayLocation(outlet.outlet_address)}
-                    </p>
-                    <p className="paragraphTextMobile mt-1">
-                      Company: {outlet.company_name}
-                    </p>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {view === "list" && (
-            <div className="space-y-4">
-              {paginatedOutlets.map((outlet) => (
-                <div
-                  key={outlet._id}
-                  className="relative bg-white p-4 shadow-md rounded-md flex flex-col sm:flex-row sm:items-center justify-between hover:shadow"
-                >
-                  <Link
-                    to={`/single-outlet/${outlet._id}`}
-                    className="paragraphTextMobile"
-                  >
+                  <FaTrashAlt />
+                </button>
+                <Link to={`/single-outlet/${outlet._id}`}>
+                  <h3 className="subHeadingTextMobile mb-2">
                     {outlet.outlet_name}
-                  </Link>
-                  <p className="paragraphTextMobile text-sm text-gray-500">
+                  </h3>
+                  <p className="paragraphTextMobile">
+                    {displayLocation(outlet.outlet_address)}
+                  </p>
+                  <p className="paragraphTextMobile mt-1">
+                    Company: {outlet.company_name}
+                  </p>
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* List View */}
+        {view === "list" && (
+          <div className="space-y-4 mt-10">
+            {paginatedOutlets.map((outlet) => (
+              <div
+                key={outlet._id}
+                className="relative bg-white p-4 shadow-md rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center"
+              >
+                <Link
+                  to={`/single-outlet/${outlet._id}`}
+                  className="w-full sm:w-auto mb-2 sm:mb-0"
+                >
+                  <h3 className="paragraphTextMobile font-semibold">
+                    {outlet.outlet_name}
+                  </h3>
+                  <p className="paragraphTextMobile text-sm text-gray-600">
                     {displayLocation(outlet.outlet_address)} | Company:{" "}
                     {outlet.company_name}
                   </p>
-                  <button
-                    onClick={() => deleteOutlet(outlet._id)}
-                    className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                  >
-                    <FaTrashAlt />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+                </Link>
+                <button
+                  onClick={() => deleteOutlet(outlet._id)}
+                  className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                >
+                  <FaTrashAlt />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center mt-8 space-x-4">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="secondaryBtn w-auto px-4"
-              >
-                Previous
-              </button>
-              <span className="text-sm text-gray-700">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-                className="secondaryBtn w-auto px-4"
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </div>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-8 space-x-4">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="secondaryBtn w-auto px-4"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="secondaryBtn w-auto px-4"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

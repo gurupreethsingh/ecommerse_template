@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { FaUser, FaEdit, FaImage } from "react-icons/fa";
+import { FaImage, FaUser, FaCalendarAlt } from "react-icons/fa";
+import { MdEdit } from "react-icons/md";
+import { motion } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import globalBackendRoute from "../../config/Config";
@@ -57,90 +59,114 @@ export default function SingleCategory() {
   };
 
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return "";
+    if (!imagePath) return "https://via.placeholder.com/150";
     return `${globalBackendRoute}/${imagePath.replace(/\\/g, "/")}`;
   };
 
-  if (!categoryData) {
-    return <div>Loading...</div>;
-  }
+  if (!categoryData) return <div className="text-center py-8">Loading...</div>;
 
   return (
-    <div className="bg-white py-16 sm:py-20">
-      <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg">
-        <div className="flex justify-between items-center flex-wrap">
-          <h2 className="headingText">Single Category</h2>
-          <Link to="/all-categories" className="fileUploadBtn text-sm">
-            All Categories
-          </Link>
-        </div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="containerWidth my-6"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-start items-center gap-6">
+        {/* Category Image */}
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="w-auto h-full sm:w-48 sm:h-48"
+        >
+          <img
+            src={getImageUrl(categoryData.category_image)}
+            alt={categoryData.category_name}
+            className="w-full h-full object-cover rounded-xl border"
+            onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
+          />
+        </motion.div>
 
-        <div className="mt-6 flex flex-col sm:flex-row items-start">
-          <div className="w-full shadow rounded lg:p-5 sm:p-0">
-            <h3 className="subHeadingText mb-4 ">
-              {categoryData.category_name} Category Details
-            </h3>
+        {/* Category Details */}
+        <div className="w-full">
+          <motion.h3
+            className="subHeadingTextMobile lg:subHeadingText mb-4"
+            initial={{ x: -30, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+          >
+            Category Details
+          </motion.h3>
 
-            {/* Category Image */}
-            <div className="mb-6 space-y-2 flex justify-center">
-              <img
-                src={getImageUrl(categoryData.category_image)}
-                alt={categoryData.category_name}
-                className="w-full max-w-md h-56 object-cover rounded-md shadow border"
+          <div className="border-t border-gray-200 divide-y divide-gray-100">
+            <CategoryField
+              icon={<FaUser className="text-blue-600" />}
+              label="Category Name"
+              value={
+                editMode ? (
+                  <input
+                    type="text"
+                    value={updatedCategoryName}
+                    onChange={(e) => setUpdatedCategoryName(e.target.value)}
+                    className="formInput"
+                  />
+                ) : (
+                  categoryData.category_name
+                )
+              }
+            />
+            <CategoryField
+              icon={<FaCalendarAlt className="text-green-600" />}
+              label="Created At"
+              value={new Date(categoryData.createdAt).toLocaleDateString()}
+            />
+            {editMode && (
+              <CategoryField
+                icon={<FaImage className="text-indigo-600" />}
+                label="New Image"
+                value={
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setNewCategoryImage(e.target.files[0])}
+                    className="formInput"
+                  />
+                }
               />
-              {editMode && (
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setNewCategoryImage(e.target.files[0])}
-                  className="formInput"
-                />
-              )}
-            </div>
+            )}
+          </div>
 
-            <div className="border-t border-gray-100">
-              <dl className="divide-y divide-gray-100">
-                {/* Category Name */}
-                <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="flex items-center text-sm font-medium leading-6 text-gray-900">
-                    <FaUser className="text-indigo-600 mr-2" /> Category Name
-                  </dt>
-                  <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0 flex items-center gap-2">
-                    {editMode ? (
-                      <input
-                        type="text"
-                        value={updatedCategoryName}
-                        onChange={(e) => setUpdatedCategoryName(e.target.value)}
-                        className="formInput"
-                      />
-                    ) : (
-                      categoryData.category_name
-                    )}
-                    <button
-                      onClick={() =>
-                        editMode ? handleUpdateCategory() : setEditMode(true)
-                      }
-                      className="primaryBtnMobile w-auto px-3 py-1"
-                    >
-                      {editMode ? "Save" : <FaEdit />}
-                    </button>
-                  </dd>
-                </div>
+          <div className="mt-6 text-center flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={() =>
+                editMode ? handleUpdateCategory() : setEditMode(true)
+              }
+              className="primaryBtn w-fit px-4 flex items-center gap-2 rounded-full"
+            >
+              <MdEdit /> {editMode ? "Save" : "Update"}
+            </button>
 
-                {/* Created At */}
-                <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="flex items-center text-sm font-medium leading-6 text-gray-900">
-                    Created At
-                  </dt>
-                  <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                    {new Date(categoryData.createdAt).toLocaleDateString()}
-                  </dd>
-                </div>
-              </dl>
-            </div>
+            <Link
+              to="/all-categories"
+              className="secondaryBtn w-fit px-4 rounded-full"
+            >
+              Back to All Categories
+            </Link>
           </div>
         </div>
       </div>
+    </motion.div>
+  );
+}
+
+function CategoryField({ icon, label, value }) {
+  return (
+    <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 px-2 sm:px-4">
+      <dt className="flex items-center text-sm font-medium text-gray-700 gap-2">
+        {icon} {label}
+      </dt>
+      <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+        {value}
+      </dd>
     </div>
   );
 }

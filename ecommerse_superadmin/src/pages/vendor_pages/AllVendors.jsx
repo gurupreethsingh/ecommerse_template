@@ -14,6 +14,8 @@ export default function AllVendors() {
   const [vendors, setVendors] = useState([]);
   const [view, setView] = useState("grid");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     axios
@@ -35,8 +37,88 @@ export default function AllVendors() {
     }
   };
 
-  const filteredVendors = vendors.filter((v) =>
-    v.vendor_name.toLowerCase().includes(searchQuery.toLowerCase())
+  // Stopwords and fuzzy search logic
+  const stopwords = [
+    "show",
+    "me",
+    "all",
+    "of",
+    "the",
+    "vendors",
+    "vendor",
+    "please",
+    "find",
+    "list",
+    "give",
+    "i",
+    "want",
+    "to",
+    "see",
+    "display",
+    "get",
+    "need",
+    "for",
+    "on",
+    "in",
+    "at",
+    "a",
+    "an",
+    "this",
+    "that",
+    "those",
+    "these",
+    "my",
+    "your",
+    "their",
+    "our",
+    "from",
+    "and",
+    "or",
+    "by",
+    "can",
+    "you",
+    "let",
+    "us",
+    "would",
+    "should",
+    "could",
+    "will",
+    "just",
+    "is",
+    "there",
+  ];
+
+  const fuzzyIncludes = (text, keyword) => {
+    const len = keyword.length;
+    if (len < 3) return text.includes(keyword);
+    const partial = keyword.slice(0, Math.max(3, len - 2));
+    return text.includes(partial);
+  };
+
+  const filteredVendors = vendors.filter((vendor) => {
+    if (!searchQuery.trim()) return true;
+
+    const fullText =
+      `${vendor.vendor_name} ${vendor.vendor_email} ${vendor.company_name}`.toLowerCase();
+
+    const queryWords = searchQuery
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((word) => word && !stopwords.includes(word));
+
+    return queryWords.some(
+      (word) =>
+        fuzzyIncludes(fullText, word) ||
+        fuzzyIncludes(fullText, word.replace(/s$/, ""))
+    );
+  });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredVendors.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedVendors = filteredVendors.slice(
+    startIndex,
+    startIndex + itemsPerPage
   );
 
   const renderVendorCard = (vendor, size = "md") => (
@@ -60,6 +142,12 @@ export default function AllVendors() {
         >
           {vendor.vendor_name}
         </h3>
+        <p className="paragraphTextMobile text-sm mt-1 text-gray-600">
+          {vendor.vendor_email}
+        </p>
+        <p className="paragraphTextMobile text-sm text-gray-600">
+          {vendor.company_name}
+        </p>
       </Link>
     </div>
   );
@@ -67,10 +155,17 @@ export default function AllVendors() {
   return (
     <div className="containerWidth py-12">
       {/* Header */}
-      <div className="flex justify-between items-center flex-wrap gap-4 mb-6">
-        <h2 className="headingText">All Vendors</h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h2 className="headingText flex items-center gap-2">
+          All Vendors
+          <span className="text-sm font-normal text-gray-600">
+            (Showing {startIndex + 1}–
+            {Math.min(startIndex + itemsPerPage, filteredVendors.length)} of{" "}
+            {filteredVendors.length})
+          </span>
+        </h2>
+
         <div className="flex items-center gap-3 flex-wrap">
-          {/* View Controls */}
           {[
             ["list", FaThList],
             ["card", FaThLarge],
@@ -84,7 +179,6 @@ export default function AllVendors() {
               }`}
             />
           ))}
-          {/* Search */}
           <div className="relative">
             <FaSearch className="absolute left-3 top-3 text-gray-400" />
             <input
@@ -92,31 +186,33 @@ export default function AllVendors() {
               className="formInput pl-10 pr-4"
               placeholder="Search vendors..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
             />
           </div>
-          {/* Add Button */}
           <Link to="/add-vendor" className="fileUploadBtn text-sm">
             Add Vendor
           </Link>
         </div>
       </div>
 
-      {/* Vendor Views */}
+      {/* Views */}
       <div className="mt-6">
         {view === "grid" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {filteredVendors.map((v) => renderVendorCard(v))}
+            {paginatedVendors.map((v) => renderVendorCard(v))}
           </div>
         )}
         {view === "card" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredVendors.map((v) => renderVendorCard(v, "lg"))}
+            {paginatedVendors.map((v) => renderVendorCard(v, "lg"))}
           </div>
         )}
         {view === "list" && (
           <div className="space-y-4">
-            {filteredVendors.map((v) => (
+            {paginatedVendors.map((v) => (
               <div
                 key={v._id}
                 className="relative bg-white p-4 shadow rounded-lg flex items-center justify-between"
@@ -138,6 +234,31 @@ export default function AllVendors() {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-8 space-x-4">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="secondaryBtn w-auto px-4"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-gray-700">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className="secondaryBtn w-auto px-4"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

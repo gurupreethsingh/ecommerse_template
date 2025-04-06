@@ -21,16 +21,18 @@ const roles = [
   "course_coordinator",
   "customer_support",
   "data_scientist",
+  "delivery_agent",
   "department_head",
   "developer",
-  "event_coordinator",
   "employee",
+  "event_coordinator",
   "hr_manager",
   "intern",
   "legal_advisor",
   "maintenance_staff",
   "marketing_manager",
   "operations_manager",
+  "outlet",
   "product_owner",
   "project_manager",
   "qa_lead",
@@ -45,13 +47,12 @@ const roles = [
   "user",
   "ux_ui_designer",
   "vendor",
-  "outlet",
-  "delivery_person",
-];
+].sort();
 
 export default function SingleUser() {
   const [userData, setUserData] = useState(null);
   const [newRole, setNewRole] = useState("");
+  const [imageSrc, setImageSrc] = useState("");
   const { id } = useParams();
 
   useEffect(() => {
@@ -64,8 +65,13 @@ export default function SingleUser() {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setUserData(response.data);
-        setNewRole(response.data.role);
+        const user = response.data;
+        setUserData(user);
+        setNewRole(user.role);
+        const imgUrl = user.avatar
+          ? `${globalBackendRoute}/${user.avatar.replace(/\\/g, "/")}`
+          : "https://via.placeholder.com/150?text=No+Image";
+        setImageSrc(imgUrl);
       } catch (error) {
         console.error("Error fetching user data:", error.message);
       }
@@ -75,7 +81,7 @@ export default function SingleUser() {
 
   const handleRoleUpdate = async () => {
     if (newRole === userData.role) {
-      alert("No changes detected. Role remains the same.");
+      toast.info("No changes detected. Role remains the same.");
       return;
     }
 
@@ -87,24 +93,19 @@ export default function SingleUser() {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(
+      await axios.put(
         `${globalBackendRoute}/api/update-user-role/${id}`,
         { role: newRole },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert(`Role has been successfully updated to "${newRole}".`);
-      window.location.reload(); // ✅ Reload after success
+      toast.success(`Role updated to "${newRole}".`);
+      window.location.reload();
     } catch (error) {
       console.error("Error updating role:", error.message);
-      alert("Failed to update role. Please try again.");
-      window.location.reload(); // ✅ Reload after failure
+      toast.error("Failed to update role.");
+      window.location.reload();
     }
-  };
-
-  const getImageUrl = (avatar) => {
-    if (!avatar) return "https://via.placeholder.com/150";
-    return `${globalBackendRoute}/${avatar.replace(/\\/g, "/")}`;
   };
 
   if (!userData) return <div className="text-center py-8">Loading...</div>;
@@ -117,19 +118,25 @@ export default function SingleUser() {
       className="containerWidth my-6"
     >
       <div className="flex flex-col sm:flex-row sm:items-start items-center gap-6">
+        {/* Image matching Profile page */}
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="w-auto h-full sm:w-48 sm:h-48"
         >
           <img
-            src={getImageUrl(userData.avatar)}
+            src={imageSrc}
             alt={userData.name}
-            className="w-full h-full object-cover rounded-xl border"
-            onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
+            className="w-full h-full object-cover rounded-xl border bg-gray-100"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src =
+                "https://via.placeholder.com/150?text=No+Image";
+            }}
           />
         </motion.div>
 
+        {/* User Details */}
         <div className="w-full">
           <motion.h3
             className="subHeadingTextMobile lg:subHeadingText mb-4"
@@ -154,6 +161,11 @@ export default function SingleUser() {
               icon={<FaPhone className="text-yellow-600" />}
               label="Phone"
               value={userData.phone || "N/A"}
+            />
+            <ProfileField
+              icon={<FaUserShield className="text-red-500" />}
+              label="Role"
+              value={userData.role}
             />
             <ProfileField
               icon={<FaMapMarkerAlt className="text-purple-600" />}
@@ -182,6 +194,7 @@ export default function SingleUser() {
             />
           </div>
 
+          {/* Role Update */}
           <div className="mt-6">
             <label className="formLabel mb-1">Update Role</label>
             <select

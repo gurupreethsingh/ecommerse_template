@@ -101,8 +101,8 @@ export const PublicRoute = ({ children }) => {
         return <Navigate to="/employee-dashboard" />;
       case "vendor":
         return <Navigate to="/vendor-dashboard" />;
-      case "delivery_person":
-        return <Navigate to="/delivery-dashboard" />;
+      case "delivery_agent":
+        return <Navigate to="/delivery-agent-dashboard" />;
       case "outlet":
         return <Navigate to="/outlet-dashboard" />;
       case "user":

@@ -40,7 +40,7 @@ export default function Profile() {
   };
 
   const getImageUrl = (avatar) => {
-    if (!avatar) return "https://via.placeholder.com/150";
+    if (!avatar) return "https://via.placeholder.com/150?text=No+Image";
     return `${globalBackendRoute}/${avatar.replace(/\\/g, "/")}`;
   };
 
@@ -54,7 +54,7 @@ export default function Profile() {
       className="containerWidth my-6"
     >
       <div className="flex flex-col sm:flex-row sm:items-start items-center gap-6">
-        {/* Profile Image */}
+        {/* Image */}
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -63,12 +63,16 @@ export default function Profile() {
           <img
             src={getImageUrl(userData.avatar)}
             alt={userData.name}
-            className="w-full h-full object-cover rounded-xl border"
-            onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
+            className="w-full h-full object-cover rounded-xl border bg-gray-100"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src =
+                "https://via.placeholder.com/150?text=No+Image";
+            }}
           />
         </motion.div>
 
-        {/* Profile Details */}
+        {/* Details */}
         <div className="w-full">
           <motion.h3
             className="subHeadingTextMobile lg:subHeadingText mb-4"

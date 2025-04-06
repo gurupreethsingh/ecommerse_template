@@ -16,12 +16,15 @@ import {
   FaThLarge,
   FaTh,
   FaSearch,
+  FaBoxes,
+  FaLayerGroup,
 } from "react-icons/fa";
 import globalBackendRoute from "../../config/Config";
 
 const SuperadminDashboard = () => {
   const navigate = useNavigate();
   const [counts, setCounts] = useState({});
+  const [entities, setEntities] = useState({});
   const [search, setSearch] = useState("");
   const [userId, setUserId] = useState(null);
   const [view, setView] = useState("grid");
@@ -43,10 +46,12 @@ const SuperadminDashboard = () => {
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        const res = await axios.get(
-          `${globalBackendRoute}/api/getUserCountsByRole`
-        );
-        setCounts(res.data);
+        const [roleRes, entityRes] = await Promise.all([
+          axios.get(`${globalBackendRoute}/api/getUserCountsByRole`),
+          axios.get(`${globalBackendRoute}/api/get-entity-counts`),
+        ]);
+        setCounts(roleRes.data);
+        setEntities(entityRes.data);
       } catch (err) {
         console.error("Failed to fetch counts", err);
       }
@@ -63,44 +68,124 @@ const SuperadminDashboard = () => {
     outlet: <FaBuilding className="text-blue-500 text-3xl" />,
     delivery_person: <FaBoxOpen className="text-teal-500 text-3xl" />,
     totalUsers: <FaUsers className="text-blue-600 text-3xl" />,
+    category: <FaLayerGroup className="text-yellow-600 text-3xl" />,
+    product: <FaBoxes className="text-green-600 text-3xl" />,
   };
 
-  const bgMap = {
-    admin: "bg-indigo-50",
-    superadmin: "bg-red-50",
-    user: "bg-green-50",
-    developer: "bg-purple-50",
-    vendor: "bg-orange-50",
-    outlet: "bg-blue-50",
-    delivery_person: "bg-teal-50",
-    totalUsers: "bg-blue-50",
+  const bgColorLogic = (value) => {
+    if (value < 5) return "bg-red-100 animate-pulse border border-red-400";
+    if (value < 10) return "bg-yellow-100 border border-yellow-400";
+    return "bg-gray-100";
   };
 
-  const cards = Object.keys(counts).map((role) => {
+  const userRoleCards = Object.entries(counts).map(([key, value]) => {
+    if (!value || value === 0) return null;
     const title =
-      role === "totalUsers"
+      key === "totalUsers"
         ? "Total Users"
-        : role.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-
+        : key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
     return {
       title,
-      value: counts[role],
-      link: role === "totalUsers" ? "/all-users" : `/all-${role}`,
-      icon: iconMap[role] || <FaUsers className="text-gray-600 text-3xl" />,
-      bgColor: bgMap[role] || "bg-gray-100",
+      value,
+      link: key === "totalUsers" ? "/all-users" : `/all-${key}`,
+      icon: iconMap[key] || <FaUsers className="text-gray-600 text-3xl" />,
+      bgColor: bgColorLogic(value),
     };
   });
 
-  const filteredCards = cards.filter((card) =>
-    card.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const entityCards = Object.entries(entities).map(([key, value]) => {
+    if (!value || value === 0) return null;
+    const title = key
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+    const pathMap = {
+      category: "/all-categories",
+      product: "/all-added-products",
+      vendor: "/all-vendors",
+      outlet: "/all-outlets",
+    };
+    return {
+      title,
+      value,
+      link: pathMap[key] || "/",
+      icon: iconMap[key] || <FaBoxes className="text-gray-600 text-3xl" />,
+      bgColor: bgColorLogic(value),
+    };
+  });
+
+  const allCards = [...userRoleCards, ...entityCards].filter(Boolean);
+
+  // 🧠 Sentence-based Search Logic
+  const stopwords = [
+    "show",
+    "me",
+    "all",
+    "of",
+    "the",
+    "users",
+    "with",
+    "please",
+    "find",
+    "list",
+    "give",
+    "i",
+    "want",
+    "to",
+    "see",
+    "display",
+    "get",
+    "need",
+    "for",
+    "on",
+    "in",
+    "at",
+    "a",
+    "an",
+    "this",
+    "that",
+    "those",
+    "these",
+    "my",
+    "your",
+    "their",
+    "our",
+    "from",
+    "and",
+    "or",
+    "by",
+    "can",
+    "you",
+    "let",
+    "us",
+    "would",
+    "should",
+    "could",
+    "will",
+    "just",
+  ];
+
+  const filteredCards =
+    search.trim() === ""
+      ? allCards
+      : allCards.filter((card) => {
+          const text = `${card.title} ${card.value}`.toLowerCase();
+          const queryWords = search
+            .toLowerCase()
+            .split(/\s+/)
+            .filter((word) => !stopwords.includes(word));
+          return queryWords.some(
+            (word) =>
+              text.includes(word) || text.includes(word.replace(/s$/, ""))
+          );
+        });
 
   return (
     <div className="fullWidth py-6">
       <div className="containerWidth">
-        <div className="flex justify-between items-center flex-wrap mb-4">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center flex-wrap mb-6 gap-4">
           <h1 className="headingText">Superadmin Dashboard</h1>
-          <div className="flex items-center space-x-4 flex-wrap">
+          <div className="flex items-center flex-wrap gap-3">
             <FaThList
               className={`text-xl cursor-pointer ${
                 view === "list" ? "text-indigo-600" : "text-gray-600"
@@ -119,11 +204,11 @@ const SuperadminDashboard = () => {
               }`}
               onClick={() => setView("grid")}
             />
-            <div className="relative">
+            <div className="relative w-full sm:w-64">
               <FaSearch className="absolute left-3 top-3 text-gray-400" />
               <input
                 type="text"
-                className="pl-10 pr-4 py-2 border rounded-md focus:outline-none"
+                className="formInput pl-10"
                 placeholder="Search cards..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -132,129 +217,99 @@ const SuperadminDashboard = () => {
           </div>
         </div>
 
+        {/* Layout */}
         <div className="flex flex-col md:flex-row gap-6">
           {/* Left Navigation */}
-          <div className="w-full md:w-1/4 p-0">
-            <ul className="space-y-4">
-              <li>
+          <aside className="w-full md:w-1/4">
+            <nav className="rounded-lg overflow-hidden border-gray-200">
+              {[
+                {
+                  label: "Account Settings",
+                  icon: <FaCog className="text-indigo-600" />,
+                  path: `/profile/${userId}`,
+                },
+                {
+                  label: "Add Category",
+                  icon: <FaPlus className="text-orange-500" />,
+                  path: "/add-category",
+                },
+                {
+                  label: "Add Product",
+                  icon: <FaBoxOpen className="text-green-600" />,
+                  path: "/add-product",
+                },
+                {
+                  label: "Add Vendor",
+                  icon: <FaStore className="text-purple-600" />,
+                  path: "/add-vendor",
+                },
+                {
+                  label: "Add Outlet",
+                  icon: <FaBuilding className="text-orange-500" />,
+                  path: "/add-outlet",
+                },
+                {
+                  label: "Add Employee",
+                  icon: <FaUserPlus className="text-teal-600" />,
+                  path: "/add-employee",
+                },
+              ].map((item, index) => (
                 <button
-                  className="flex items-center gap-3 text-gray-800 hover:text-indigo-600"
-                  onClick={() => navigate("/profile/" + userId)}
+                  key={index}
+                  onClick={() => navigate(item.path)}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold shadow-sm text-gray-700 hover:shadow-lg hover:bg-green-50 rounded border-b"
                 >
-                  <FaCog className="text-gray-600" /> Account Settings
+                  <span className="text-lg">{item.icon}</span>
+                  {item.label}
                 </button>
-              </li>
-              <li>
-                <button
-                  className="flex items-center gap-3 text-gray-800 hover:text-blue-600"
-                  onClick={() => navigate("/add-category")}
-                >
-                  <FaPlus className="text-blue-500" /> Add Category
-                </button>
-              </li>
-              <li>
-                <button
-                  className="flex items-center gap-3 text-gray-800 hover:text-green-600"
-                  onClick={() => navigate("/add-product")}
-                >
-                  <FaBoxOpen className="text-green-500" /> Add Product
-                </button>
-              </li>
-              <li>
-                <button
-                  className="flex items-center gap-3 text-gray-800 hover:text-purple-600"
-                  onClick={() => navigate("/add-vendor")}
-                >
-                  <FaStore className="text-purple-500" /> Add Vendor
-                </button>
-              </li>
-              <li>
-                <button
-                  className="flex items-center gap-3 text-gray-800 hover:text-orange-600"
-                  onClick={() => navigate("/add-outlet")}
-                >
-                  <FaBuilding className="text-orange-500" /> Add Outlet
-                </button>
-              </li>
-              <li>
-                <button
-                  className="flex items-center gap-3 text-gray-800 hover:text-teal-600"
-                  onClick={() => navigate("/add-employee")}
-                >
-                  <FaUserPlus className="text-teal-500" /> Add Employee
-                </button>
-              </li>
-            </ul>
-          </div>
+              ))}
+            </nav>
+          </aside>
 
           {/* Right Content */}
-          <div className="w-full md:w-3/4">
-            {view === "grid" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredCards.map((card, index) => (
+          <main className="w-full md:w-3/4">
+            <div
+              className={`${
+                view === "grid"
+                  ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
+                  : view === "card"
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                  : "space-y-4"
+              }`}
+            >
+              {filteredCards.map((card, index) => (
+                <div
+                  key={index}
+                  onClick={() => navigate(card.link)}
+                  className={`rounded cursor-pointer transition duration-200 hover:shadow-md ${
+                    card.bgColor
+                  } ${
+                    view === "card"
+                      ? "p-6 flex flex-col items-center justify-between text-center shadow"
+                      : view === "grid"
+                      ? "p-4"
+                      : "p-4 flex items-center justify-between"
+                  }`}
+                >
                   <div
-                    key={index}
-                    onClick={() => navigate(card.link)}
-                    className={`p-4 rounded shadow hover:shadow-md transition cursor-pointer ${card.bgColor}`}
+                    className={
+                      view === "list"
+                        ? "flex items-center gap-4"
+                        : "flex items-center justify-between w-full"
+                    }
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="subHeadingText mb-1">{card.title}</p>
-                        <p className="text-2xl font-bold text-gray-800">
-                          {card.value}
-                        </p>
-                      </div>
-                      <div>{card.icon}</div>
+                    <div>
+                      <p className="subHeadingText mb-1">{card.title}</p>
+                      <p className="text-xl font-bold text-gray-800">
+                        {card.value}
+                      </p>
                     </div>
+                    <div>{card.icon}</div>
                   </div>
-                ))}
-              </div>
-            )}
-
-            {view === "card" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredCards.map((card, index) => (
-                  <div
-                    key={index}
-                    onClick={() => navigate(card.link)}
-                    className={`p-6 rounded shadow hover:shadow-lg transition cursor-pointer ${card.bgColor}`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="subHeadingText mb-2">{card.title}</p>
-                        <p className="text-3xl font-bold text-gray-800">
-                          {card.value}
-                        </p>
-                      </div>
-                      <div>{card.icon}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {view === "list" && (
-              <div className="space-y-4">
-                {filteredCards.map((card, index) => (
-                  <div
-                    key={index}
-                    onClick={() => navigate(card.link)}
-                    className={`flex items-center justify-between p-4 rounded shadow hover:shadow-md transition cursor-pointer ${card.bgColor}`}
-                  >
-                    <div className="flex items-center gap-4">
-                      {card.icon}
-                      <div>
-                        <p className="subHeadingText mb-1">{card.title}</p>
-                        <p className="text-xl font-bold text-gray-800">
-                          {card.value}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
+              ))}
+            </div>
+          </main>
         </div>
       </div>
     </div>
