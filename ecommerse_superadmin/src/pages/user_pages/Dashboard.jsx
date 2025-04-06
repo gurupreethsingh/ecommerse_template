@@ -23,18 +23,18 @@ const Dashboard = () => {
   const [view, setView] = useState("grid");
   const [search, setSearch] = useState("");
   const [user, setUser] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUser(decoded);
-      } catch (error) {
-        console.error("Invalid token:", error);
-      }
+    if (!token) return navigate("/my-account");
+    try {
+      const decoded = jwtDecode(token);
+      setUserId(decoded.id);
+    } catch (error) {
+      navigate("/my-account");
     }
-  }, []);
+  }, [navigate]);
 
   if (!user) return null;
 
@@ -126,7 +126,7 @@ const Dashboard = () => {
                 {
                   label: "My Profile",
                   icon: <FaUser className="text-indigo-600" />,
-                  path: "/profile",
+                  path: `/profile/${userId}`,
                 },
                 {
                   label: "Orders",

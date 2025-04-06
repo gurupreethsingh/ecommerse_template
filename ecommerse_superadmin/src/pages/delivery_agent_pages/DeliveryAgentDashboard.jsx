@@ -22,6 +22,18 @@ const DeliveryAgentDashboard = () => {
   const navigate = useNavigate();
   const [view, setView] = useState("grid");
   const [search, setSearch] = useState("");
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/my-account");
+    try {
+      const decoded = jwtDecode(token);
+      setUserId(decoded.id);
+    } catch (error) {
+      navigate("/my-account");
+    }
+  }, [navigate]);
 
   const dummyCards = [
     {
@@ -111,7 +123,7 @@ const DeliveryAgentDashboard = () => {
                 {
                   label: "My Profile",
                   icon: <FaUserCog className="text-indigo-600" />,
-                  path: "/profile",
+                  path: `/profile/${userId}`,
                 },
                 {
                   label: "Today’s Schedule",

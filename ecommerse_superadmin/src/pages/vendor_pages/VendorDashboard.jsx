@@ -21,6 +21,17 @@ const VendorDashboard = () => {
   const navigate = useNavigate();
   const [view, setView] = useState("grid");
   const [search, setSearch] = useState("");
+  const [userId, setUserId] = useState(null);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/my-account");
+    try {
+      const decoded = jwtDecode(token);
+      setUserId(decoded.id);
+    } catch (error) {
+      navigate("/my-account");
+    }
+  }, [navigate]);
 
   const dummyCards = [
     {

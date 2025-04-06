@@ -21,6 +21,18 @@ const HrDashboard = () => {
   const navigate = useNavigate();
   const [view, setView] = useState("grid");
   const [search, setSearch] = useState("");
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/my-account");
+    try {
+      const decoded = jwtDecode(token);
+      setUserId(decoded.id);
+    } catch (error) {
+      navigate("/my-account");
+    }
+  }, [navigate]);
 
   const dummyCards = [
     {
@@ -101,10 +113,16 @@ const HrDashboard = () => {
               navigate={navigate}
               items={[
                 {
+                  label: "Account Settings",
+                  icon: <FaCog className="text-indigo-600" />,
+                  path: `/profile/${userId}`,
+                },
+                {
                   label: "Add Employee",
-                  icon: <FaUserPlus className="text-indigo-600" />,
+                  icon: <FaUserPlus className="text-orange-600" />,
                   path: "/add-employee",
                 },
+
                 {
                   label: "Manage Jobs",
                   icon: <FaClipboardList className="text-blue-600" />,
