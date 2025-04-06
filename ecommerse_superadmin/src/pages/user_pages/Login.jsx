@@ -1,8 +1,8 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
+import { FaSignInAlt } from "react-icons/fa";
 import { AuthContext } from "../../components/auth_components/AuthManager";
 import globalBackendRoute from "../../config/Config";
-import { FaSignInAlt } from "react-icons/fa";
 
 const Login = () => {
   const { login } = useContext(AuthContext);
@@ -58,44 +58,75 @@ const Login = () => {
     }
   };
 
-  const renderInput = (label, type, id) => (
-    <div>
-      <label htmlFor={id} className="formLabel">
-        {label}
-      </label>
-      <input
-        id={id}
-        name={id}
-        type={type}
-        value={formData[id]}
-        onChange={handleChange}
-        required
-        className="mt-2 formInput"
-      />
-    </div>
-  );
-
   return (
-    <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <FaSignInAlt className="iconPrimary" />
-        <h2 className="mt-6 text-center headingTextMobile lg:headingText">
+    <div className="compactWidth py-12">
+      {/* Header */}
+      <div className="text-center">
+        <FaSignInAlt className="iconPrimary mx-auto" size={48} />
+        <h2 className="headingTextMobile lg:headingText mt-4">
           Sign in to your account
         </h2>
       </div>
 
-      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
-        {error && <p className="errorText mb-4">{error}</p>}
+      {/* Form */}
+      <div className="mt-10">
+        {error && <p className="errorText text-center mb-4">{error}</p>}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {renderInput("Email address", "email", "email")}
-          {renderInput("Password", "password", "password")}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Email Input */}
+          <div>
+            <label
+              htmlFor="email"
+              className="formLabel flex items-center gap-2"
+            >
+              Email address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="formInput mt-2"
+              placeholder="Enter your email address"
+            />
+          </div>
 
-          <button type="submit" className="primaryBtn">
+          {/* Password Input with Forgot Link */}
+          <div>
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="password"
+                className="formLabel flex items-center gap-2"
+              >
+                Password
+              </label>
+              <a
+                href="/forgot-password"
+                className="text-sm text-indigo-500 hover:text-indigo-600 font-bold"
+              >
+                Forgot password?
+              </a>
+            </div>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="formInput mt-2"
+              placeholder="Enter your password"
+            />
+          </div>
+
+          <button type="submit" className="primaryBtn w-full">
             Login
           </button>
         </form>
 
+        {/* Footer */}
         <p className="mt-6 text-center paragraphTextMobile">
           Don't have an account?{" "}
           <a href="/register" className="linkTextMobile lg:linkText">

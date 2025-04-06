@@ -3,23 +3,25 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import {
-  FaUsers,
-  FaUserShield,
-  FaUserPlus,
-  FaUserCheck,
-  FaCog,
-  FaBoxOpen,
-  FaStore,
-  FaBuilding,
-  FaPlus,
   FaThList,
   FaThLarge,
   FaTh,
-  FaSearch,
-  FaBoxes,
-  FaLayerGroup,
+  FaCog,
+  FaPlus,
+  FaBoxOpen,
+  FaStore,
+  FaBuilding,
+  FaUserPlus,
 } from "react-icons/fa";
+
 import globalBackendRoute from "../../config/Config";
+import SearchBar from "../../components/common_components/SearchBar";
+import LeftSidebarNav from "../../components/common_components/LeftSidebarNav";
+import DashboardCard from "../../components/common_components/DashboardCard";
+import DashboardLayout from "../../components/common_components/DashboardLayout";
+import iconMap from "../../components/common_components/iconMap.jsx";
+import bgColorLogic from "../../components/common_components/bgColorLogic.jsx";
+import stopwords from "../../components/common_components/stopwords.jsx";
 
 const SuperadminDashboard = () => {
   const navigate = useNavigate();
@@ -31,10 +33,7 @@ const SuperadminDashboard = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/my-account");
-      return;
-    }
+    if (!token) return navigate("/my-account");
     try {
       const decoded = jwtDecode(token);
       setUserId(decoded.id);
@@ -59,25 +58,6 @@ const SuperadminDashboard = () => {
     fetchCounts();
   }, []);
 
-  const iconMap = {
-    admin: <FaUserCheck className="text-indigo-600 text-3xl" />,
-    superadmin: <FaUserShield className="text-red-500 text-3xl" />,
-    user: <FaUserPlus className="text-green-600 text-3xl" />,
-    developer: <FaCog className="text-purple-600 text-3xl" />,
-    vendor: <FaStore className="text-orange-600 text-3xl" />,
-    outlet: <FaBuilding className="text-blue-500 text-3xl" />,
-    delivery_person: <FaBoxOpen className="text-teal-500 text-3xl" />,
-    totalUsers: <FaUsers className="text-blue-600 text-3xl" />,
-    category: <FaLayerGroup className="text-yellow-600 text-3xl" />,
-    product: <FaBoxes className="text-green-600 text-3xl" />,
-  };
-
-  const bgColorLogic = (value) => {
-    if (value < 5) return "bg-red-100 animate-pulse border border-red-400";
-    if (value < 10) return "bg-yellow-100 border border-yellow-400";
-    return "bg-gray-100";
-  };
-
   const userRoleCards = Object.entries(counts).map(([key, value]) => {
     if (!value || value === 0) return null;
     const title =
@@ -88,7 +68,7 @@ const SuperadminDashboard = () => {
       title,
       value,
       link: key === "totalUsers" ? "/all-users" : `/all-${key}`,
-      icon: iconMap[key] || <FaUsers className="text-gray-600 text-3xl" />,
+      icon: iconMap[key],
       bgColor: bgColorLogic(value),
     };
   });
@@ -108,61 +88,12 @@ const SuperadminDashboard = () => {
       title,
       value,
       link: pathMap[key] || "/",
-      icon: iconMap[key] || <FaBoxes className="text-gray-600 text-3xl" />,
+      icon: iconMap[key],
       bgColor: bgColorLogic(value),
     };
   });
 
   const allCards = [...userRoleCards, ...entityCards].filter(Boolean);
-
-  // 🧠 Sentence-based Search Logic
-  const stopwords = [
-    "show",
-    "me",
-    "all",
-    "of",
-    "the",
-    "users",
-    "with",
-    "please",
-    "find",
-    "list",
-    "give",
-    "i",
-    "want",
-    "to",
-    "see",
-    "display",
-    "get",
-    "need",
-    "for",
-    "on",
-    "in",
-    "at",
-    "a",
-    "an",
-    "this",
-    "that",
-    "those",
-    "these",
-    "my",
-    "your",
-    "their",
-    "our",
-    "from",
-    "and",
-    "or",
-    "by",
-    "can",
-    "you",
-    "let",
-    "us",
-    "would",
-    "should",
-    "could",
-    "will",
-    "just",
-  ];
 
   const filteredCards =
     search.trim() === ""
@@ -204,25 +135,20 @@ const SuperadminDashboard = () => {
               }`}
               onClick={() => setView("grid")}
             />
-            <div className="relative w-full sm:w-64">
-              <FaSearch className="absolute left-3 top-3 text-gray-400" />
-              <input
-                type="text"
-                className="formInput pl-10"
-                placeholder="Search cards..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
+            <SearchBar
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search cards..."
+            />
           </div>
         </div>
 
         {/* Layout */}
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Left Navigation */}
-          <aside className="w-full md:w-1/4">
-            <nav className="rounded-lg overflow-hidden border-gray-200">
-              {[
+        <DashboardLayout
+          left={
+            <LeftSidebarNav
+              navigate={navigate}
+              items={[
                 {
                   label: "Account Settings",
                   icon: <FaCog className="text-indigo-600" />,
@@ -253,21 +179,10 @@ const SuperadminDashboard = () => {
                   icon: <FaUserPlus className="text-teal-600" />,
                   path: "/add-employee",
                 },
-              ].map((item, index) => (
-                <button
-                  key={index}
-                  onClick={() => navigate(item.path)}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold shadow-sm text-gray-700 hover:shadow-lg hover:bg-green-50 rounded border-b"
-                >
-                  <span className="text-lg">{item.icon}</span>
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-          </aside>
-
-          {/* Right Content */}
-          <main className="w-full md:w-3/4">
+              ]}
+            />
+          }
+          right={
             <div
               className={`${
                 view === "grid"
@@ -278,39 +193,16 @@ const SuperadminDashboard = () => {
               }`}
             >
               {filteredCards.map((card, index) => (
-                <div
+                <DashboardCard
                   key={index}
+                  card={card}
+                  view={view}
                   onClick={() => navigate(card.link)}
-                  className={`rounded cursor-pointer transition duration-200 hover:shadow-md ${
-                    card.bgColor
-                  } ${
-                    view === "card"
-                      ? "p-6 flex flex-col items-center justify-between text-center shadow"
-                      : view === "grid"
-                      ? "p-4"
-                      : "p-4 flex items-center justify-between"
-                  }`}
-                >
-                  <div
-                    className={
-                      view === "list"
-                        ? "flex items-center gap-4"
-                        : "flex items-center justify-between w-full"
-                    }
-                  >
-                    <div>
-                      <p className="subHeadingText mb-1">{card.title}</p>
-                      <p className="text-xl font-bold text-gray-800">
-                        {card.value}
-                      </p>
-                    </div>
-                    <div>{card.icon}</div>
-                  </div>
-                </div>
+                />
               ))}
             </div>
-          </main>
-        </div>
+          }
+        />
       </div>
     </div>
   );

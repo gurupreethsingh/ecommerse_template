@@ -50,30 +50,33 @@ const roles = [
 ].sort();
 
 export default function SingleUser() {
+  const { id } = useParams();
   const [userData, setUserData] = useState(null);
   const [newRole, setNewRole] = useState("");
   const [imageSrc, setImageSrc] = useState("");
-  const { id } = useParams();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(
+        const res = await axios.get(
           `${globalBackendRoute}/api/single-user/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        const user = response.data;
+
+        const user = res.data;
         setUserData(user);
         setNewRole(user.role);
-        const imgUrl = user.avatar
-          ? `${globalBackendRoute}/${user.avatar.replace(/\\/g, "/")}`
-          : "https://via.placeholder.com/150?text=No+Image";
-        setImageSrc(imgUrl);
-      } catch (error) {
-        console.error("Error fetching user data:", error.message);
+        setImageSrc(
+          user.avatar
+            ? `${globalBackendRoute}/${user.avatar.replace(/\\/g, "/")}`
+            : "https://via.placeholder.com/150?text=No+Image"
+        );
+      } catch (err) {
+        console.error("Fetch Error:", err);
+        toast.error("Failed to fetch user.");
       }
     };
     fetchUserData();
@@ -81,14 +84,11 @@ export default function SingleUser() {
 
   const handleRoleUpdate = async () => {
     if (newRole === userData.role) {
-      toast.info("No changes detected. Role remains the same.");
+      toast.info("No changes detected.");
       return;
     }
 
-    const confirmUpdate = window.confirm(
-      `You are about to update the user's role to "${newRole}". Are you sure?`
-    );
-
+    const confirmUpdate = window.confirm(`Change role to "${newRole}"?`);
     if (!confirmUpdate) return;
 
     try {
@@ -98,55 +98,56 @@ export default function SingleUser() {
         { role: newRole },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      toast.success(`Role updated to "${newRole}".`);
+      toast.success("Role updated!");
       window.location.reload();
-    } catch (error) {
-      console.error("Error updating role:", error.message);
-      toast.error("Failed to update role.");
+    } catch (err) {
+      console.error("Update Error:", err);
+      toast.error("Role update failed.");
       window.location.reload();
     }
   };
 
-  if (!userData) return <div className="text-center py-8">Loading...</div>;
+  if (!userData)
+    return <div className="text-center py-10">Loading user...</div>;
+
+  const address = userData.address || {};
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="containerWidth my-6"
+      className="containerWidth my-8"
     >
-      <div className="flex flex-col sm:flex-row sm:items-start items-center gap-6">
-        {/* Image matching Profile page */}
+      <div className="flex flex-col sm:flex-row items-start gap-6">
+        {/* Profile Image */}
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
+          initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="w-auto h-full sm:w-48 sm:h-48"
+          className="w-full sm:w-48 h-auto"
         >
           <img
             src={imageSrc}
             alt={userData.name}
-            className="w-full h-full object-cover rounded-xl border bg-gray-100"
             onError={(e) => {
-              e.currentTarget.onerror = null;
               e.currentTarget.src =
                 "https://via.placeholder.com/150?text=No+Image";
             }}
+            className="rounded-xl border bg-gray-100 w-full h-auto object-cover"
           />
         </motion.div>
 
-        {/* User Details */}
+        {/* User Info */}
         <div className="w-full">
           <motion.h3
-            className="subHeadingTextMobile lg:subHeadingText mb-4"
-            initial={{ x: -30, opacity: 0 }}
+            initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
+            className="headingText mb-4"
           >
             User Details
           </motion.h3>
 
-          <div className="border-t border-gray-200 divide-y divide-gray-100">
+          <div className="divide-y divide-gray-200 border-t">
             <ProfileField
               icon={<FaUser className="text-blue-600" />}
               label="Full Name"
@@ -170,52 +171,52 @@ export default function SingleUser() {
             <ProfileField
               icon={<FaMapMarkerAlt className="text-purple-600" />}
               label="Street"
-              value={userData.address?.street || "N/A"}
+              value={address.street || "N/A"}
             />
             <ProfileField
               icon={<FaMapMarkerAlt className="text-indigo-600" />}
               label="City"
-              value={userData.address?.city || "N/A"}
+              value={address.city || "N/A"}
             />
             <ProfileField
               icon={<FaMapMarkerAlt className="text-pink-500" />}
               label="State"
-              value={userData.address?.state || "N/A"}
+              value={address.state || "N/A"}
             />
             <ProfileField
               icon={<FaMapMarkerAlt className="text-cyan-600" />}
               label="Postal Code"
-              value={userData.address?.postalCode || "N/A"}
+              value={address.postalCode || "N/A"}
             />
             <ProfileField
               icon={<FaMapMarkerAlt className="text-teal-600" />}
               label="Country"
-              value={userData.address?.country || "N/A"}
+              value={address.country || "N/A"}
             />
           </div>
 
-          {/* Role Update */}
-          <div className="mt-6">
-            <label className="formLabel mb-1">Update Role</label>
+          {/* Role Selection */}
+          <div className="mt-6 space-y-2">
+            <label className="formLabel">Update Role</label>
             <select
+              className="formInput"
               value={newRole}
               onChange={(e) => setNewRole(e.target.value)}
-              className="formInput"
             >
               <option value={userData.role} disabled>
                 Current Role: {userData.role}
               </option>
               {roles
-                .filter((role) => role !== userData.role)
-                .map((role) => (
-                  <option key={role} value={role}>
-                    {role}
+                .filter((r) => r !== userData.role)
+                .map((r) => (
+                  <option key={r} value={r}>
+                    {r}
                   </option>
                 ))}
             </select>
             <button
               onClick={handleRoleUpdate}
-              className="primaryBtn mt-4 w-fit px-4 rounded-full"
+              className="primaryBtn mt-2 w-fit px-4 rounded-full"
             >
               Update Role
             </button>
@@ -229,8 +230,9 @@ export default function SingleUser() {
 function ProfileField({ icon, label, value }) {
   return (
     <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 px-2 sm:px-4">
-      <dt className="flex items-center text-sm font-medium text-gray-700 gap-2">
-        {icon} {label}
+      <dt className="flex items-center gap-2 text-sm font-medium text-gray-700">
+        {icon}
+        {label}
       </dt>
       <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
         {value}

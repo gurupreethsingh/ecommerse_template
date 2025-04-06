@@ -3,14 +3,19 @@ import {
   FaTh,
   FaThLarge,
   FaThList,
-  FaSearch,
   FaBox,
   FaStore,
   FaPlus,
   FaShoppingCart,
+  FaSearch,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import PageHeading from "../../components/common_components/PageHeading";
+
+import SearchBar from "../../components/common_components/SearchBar";
+import LeftSidebarNav from "../../components/common_components/LeftSidebarNav";
+import DashboardCard from "../../components/common_components/DashboardCard";
+import DashboardLayout from "../../components/common_components/DashboardLayout";
+import stopwords from "../../components/common_components/stopwords.jsx";
 
 const VendorDashboard = () => {
   const navigate = useNavigate();
@@ -41,64 +46,20 @@ const VendorDashboard = () => {
     },
   ];
 
-  const stopwords = [
-    "show",
-    "me",
-    "all",
-    "of",
-    "the",
-    "please",
-    "find",
-    "list",
-    "give",
-    "i",
-    "want",
-    "to",
-    "see",
-    "display",
-    "get",
-    "need",
-    "for",
-    "on",
-    "in",
-    "at",
-    "a",
-    "an",
-    "this",
-    "that",
-    "those",
-    "these",
-    "my",
-    "your",
-    "their",
-    "our",
-    "from",
-    "and",
-    "or",
-    "by",
-    "can",
-    "you",
-    "let",
-    "us",
-    "would",
-    "should",
-    "could",
-    "will",
-    "just",
-  ];
-
-  const filteredCards = search.trim()
-    ? dummyCards.filter((card) => {
-        const text = `${card.title} ${card.value}`.toLowerCase();
-        const queryWords = search
-          .toLowerCase()
-          .split(/\s+/)
-          .filter((word) => !stopwords.includes(word));
-        return queryWords.some(
-          (word) => text.includes(word) || text.includes(word.replace(/s$/, ""))
-        );
-      })
-    : dummyCards;
+  const filteredCards =
+    search.trim() === ""
+      ? dummyCards
+      : dummyCards.filter((card) => {
+          const text = `${card.title} ${card.value}`.toLowerCase();
+          const queryWords = search
+            .toLowerCase()
+            .split(/\s+/)
+            .filter((word) => !stopwords.includes(word));
+          return queryWords.some(
+            (word) =>
+              text.includes(word) || text.includes(word.replace(/s$/, ""))
+          );
+        });
 
   return (
     <div className="fullWidth py-6">
@@ -125,24 +86,20 @@ const VendorDashboard = () => {
               }`}
               onClick={() => setView("grid")}
             />
-            <div className="relative w-full sm:w-64">
-              <FaSearch className="absolute left-3 top-3 text-gray-400" />
-              <input
-                type="text"
-                className="formInput pl-10"
-                placeholder="Search cards..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
+            <SearchBar
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search cards..."
+            />
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Sidebar */}
-          <aside className="w-full md:w-1/4">
-            <nav className="rounded-lg overflow-hidden border-gray-200">
-              {[
+        {/* Layout */}
+        <DashboardLayout
+          left={
+            <LeftSidebarNav
+              navigate={navigate}
+              items={[
                 {
                   label: "Add Product",
                   icon: <FaPlus className="text-green-600" />,
@@ -158,64 +115,30 @@ const VendorDashboard = () => {
                   icon: <FaStore className="text-orange-500" />,
                   path: "/profile",
                 },
-              ].map((item, index) => (
-                <button
-                  key={index}
-                  onClick={() => navigate(item.path)}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold shadow-sm text-gray-700 hover:bg-green-50 hover:shadow rounded border-b"
-                >
-                  {item.icon}
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-          </aside>
-
-          {/* Main */}
-          <main className="w-full md:w-3/4">
+              ]}
+            />
+          }
+          right={
             <div
               className={`${
                 view === "grid"
-                  ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+                  ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
                   : view === "card"
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                  ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
                   : "space-y-4"
               }`}
             >
               {filteredCards.map((card, index) => (
-                <div
+                <DashboardCard
                   key={index}
+                  card={card}
+                  view={view}
                   onClick={() => navigate(card.link)}
-                  className={`cursor-pointer rounded transition hover:shadow-md ${
-                    card.bgColor
-                  } ${
-                    view === "list"
-                      ? "p-4 flex items-center justify-between"
-                      : view === "card"
-                      ? "p-6 text-center flex flex-col items-center shadow"
-                      : "p-4"
-                  }`}
-                >
-                  <div
-                    className={
-                      view === "list"
-                        ? "flex items-center gap-4"
-                        : "flex items-center justify-between w-full"
-                    }
-                  >
-                    <div>
-                      <p className="subHeadingText mb-1">{card.title}</p>
-                      <p className="text-xl font-bold text-gray-800">
-                        {card.value}
-                      </p>
-                    </div>
-                    <div>{card.icon}</div>
-                  </div>
-                </div>
+                />
               ))}
             </div>
-          </main>
-        </div>
+          }
+        />
       </div>
     </div>
   );

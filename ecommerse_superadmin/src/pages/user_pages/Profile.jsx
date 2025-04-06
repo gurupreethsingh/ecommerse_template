@@ -54,7 +54,7 @@ export default function Profile() {
       className="containerWidth my-6"
     >
       <div className="flex flex-col sm:flex-row sm:items-start items-center gap-6">
-        {/* Image */}
+        {/* Avatar */}
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -72,7 +72,7 @@ export default function Profile() {
           />
         </motion.div>
 
-        {/* Details */}
+        {/* User Info */}
         <div className="w-full">
           <motion.h3
             className="subHeadingTextMobile lg:subHeadingText mb-4"
@@ -130,6 +130,7 @@ export default function Profile() {
             />
           </div>
 
+          {/* Button */}
           <div className="mt-6 text-center">
             <button
               onClick={handleUpdateProfile}

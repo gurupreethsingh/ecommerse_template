@@ -1,171 +1,5 @@
-// import React, { useState } from "react";
-// import axios from "axios";
-// import {
-//   FaUser,
-//   FaEnvelope,
-//   FaPhone,
-//   FaBuilding,
-//   FaHome,
-//   FaMoneyCheck,
-// } from "react-icons/fa";
-// import { MdSave } from "react-icons/md";
-// import { Link, useNavigate } from "react-router-dom";
-// import globalBackendRoute from "../../config/Config";
-
-// const AddOutlet = () => {
-//   const navigate = useNavigate();
-//   const [outlet, setOutlet] = useState({
-//     outlet_name: "",
-//     location: "",
-//     outlet_email: "",
-//     outlet_phone: "",
-//     street: "",
-//     city: "",
-//     state: "",
-//     zip_code: "",
-//     country: "",
-//     company_name: "",
-//     company_registration_number: "",
-//     bank_name: "",
-//     account_number: "",
-//     ifsc_code: "",
-//     status: "active",
-//   });
-
-//   const handleChange = (e) => {
-//     setOutlet({ ...outlet, [e.target.name]: e.target.value });
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     const outletData = {
-//       outlet_name: outlet.outlet_name,
-//       location: outlet.location,
-//       outlet_email: outlet.outlet_email,
-//       outlet_phone: outlet.outlet_phone,
-//       outlet_address: {
-//         street: outlet.street,
-//         city: outlet.city,
-//         state: outlet.state,
-//         zip_code: outlet.zip_code,
-//         country: outlet.country,
-//       },
-//       company_name: outlet.company_name,
-//       company_registration_number: outlet.company_registration_number,
-//       bank_details: {
-//         bank_name: outlet.bank_name,
-//         account_number: outlet.account_number,
-//         ifsc_code: outlet.ifsc_code,
-//       },
-//       status: outlet.status,
-//     };
-
-//     try {
-//       await axios.post(`${globalBackendRoute}/api/add-outlet`, outletData);
-//       alert("Outlet added successfully!");
-//       setOutlet({
-//         outlet_name: "",
-//         location: "",
-//         outlet_email: "",
-//         outlet_phone: "",
-//         street: "",
-//         city: "",
-//         state: "",
-//         zip_code: "",
-//         country: "",
-//         company_name: "",
-//         company_registration_number: "",
-//         bank_name: "",
-//         account_number: "",
-//         ifsc_code: "",
-//         status: "active",
-//       });
-//       navigate("/all-outlets");
-//     } catch (error) {
-//       console.error("Error adding outlet:", error);
-//       alert("There was an issue adding the outlet.");
-//     }
-//   };
-
-//   const renderField = (label, name, Icon) => (
-//     <div className="flex items-center gap-2">
-//       <label className="formLabel w-1/3 flex items-center">
-//         <Icon className="text-indigo-500 mr-2" /> {label}
-//       </label>
-//       <input
-//         type="text"
-//         name={name}
-//         value={outlet[name]}
-//         onChange={handleChange}
-//         required
-//         className="formInput w-2/3"
-//         placeholder={`Enter ${label.toLowerCase()}`}
-//       />
-//     </div>
-//   );
-
-//   return (
-//     <div className="compactWidth py-12">
-//       <div className="flex justify-between items-center mb-6">
-//         <h2 className="headingText">Add New Outlet</h2>
-//         <Link to="/all-outlets" className="linkText text-sm">
-//           View All Outlets
-//         </Link>
-//       </div>
-
-//       <form onSubmit={handleSubmit} className="space-y-4">
-//         {renderField("Outlet Name", "outlet_name", FaUser)}
-//         {renderField("Location", "location", FaBuilding)}
-//         {renderField("Email", "outlet_email", FaEnvelope)}
-//         {renderField("Phone", "outlet_phone", FaPhone)}
-
-//         {renderField("Street", "street", FaHome)}
-//         {renderField("City", "city", FaHome)}
-//         {renderField("State", "state", FaHome)}
-//         {renderField("Zip Code", "zip_code", FaHome)}
-//         {renderField("Country", "country", FaHome)}
-
-//         {renderField("Company Name", "company_name", FaBuilding)}
-//         {renderField(
-//           "Registration Number",
-//           "company_registration_number",
-//           FaBuilding
-//         )}
-
-//         {renderField("Bank Name", "bank_name", FaMoneyCheck)}
-//         {renderField("Account Number", "account_number", FaMoneyCheck)}
-//         {renderField("IFSC Code", "ifsc_code", FaMoneyCheck)}
-
-//         {/* Status Dropdown */}
-//         <div className="flex items-center gap-2">
-//           <label className="formLabel w-1/3">Status</label>
-//           <select
-//             name="status"
-//             value={outlet.status}
-//             onChange={handleChange}
-//             className="formInput w-2/3"
-//           >
-//             <option value="active">Active</option>
-//             <option value="inactive">Inactive</option>
-//           </select>
-//         </div>
-
-//         <button
-//           type="submit"
-//           className="primaryBtn mt-4 flex items-center justify-center gap-2"
-//         >
-//           <MdSave /> Add Outlet
-//         </button>
-//       </form>
-//     </div>
-//   );
-// };
-
-// export default AddOutlet;
-
-//
-
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   FaUser,
@@ -176,11 +10,18 @@ import {
   FaMoneyCheck,
 } from "react-icons/fa";
 import { MdSave } from "react-icons/md";
-import { Link, useNavigate } from "react-router-dom";
+
 import globalBackendRoute from "../../config/Config";
+import ModernTextInput from "../../components/common_components/MordernTextInput";
+import ModernFileInput from "../../components/common_components/ModernFileInput";
+import LeftSidebarNav from "../../components/common_components/LeftSidebarNav";
+import DashboardLayout from "../../components/common_components/DashboardLayout";
+import SearchBar from "../../components/common_components/SearchBar";
+import stopwords from "../../components/common_components/stopwords";
 
 const AddOutlet = () => {
   const navigate = useNavigate();
+  const [outletImage, setOutletImage] = useState(null);
   const [outlet, setOutlet] = useState({
     outlet_name: "",
     location: "",
@@ -205,31 +46,18 @@ const AddOutlet = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
 
-    const outletData = {
-      outlet_name: outlet.outlet_name,
-      location: outlet.location,
-      outlet_email: outlet.outlet_email,
-      outlet_phone: outlet.outlet_phone,
-      outlet_address: {
-        street: outlet.street,
-        city: outlet.city,
-        state: outlet.state,
-        zip_code: outlet.zip_code,
-        country: outlet.country,
-      },
-      company_name: outlet.company_name,
-      company_registration_number: outlet.company_registration_number,
-      bank_details: {
-        bank_name: outlet.bank_name,
-        account_number: outlet.account_number,
-        ifsc_code: outlet.ifsc_code,
-      },
-      status: outlet.status,
-    };
+    Object.entries(outlet).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    if (outletImage) {
+      formData.append("outlet_image", outletImage);
+    }
 
     try {
-      await axios.post(`${globalBackendRoute}/api/add-outlet`, outletData);
+      await axios.post(`${globalBackendRoute}/api/add-outlet`, formData);
       alert("Outlet added successfully!");
       setOutlet({
         outlet_name: "",
@@ -248,6 +76,7 @@ const AddOutlet = () => {
         ifsc_code: "",
         status: "active",
       });
+      setOutletImage(null);
       navigate("/all-outlets");
     } catch (error) {
       console.error("Error adding outlet:", error);
@@ -255,27 +84,9 @@ const AddOutlet = () => {
     }
   };
 
-  const renderInput = (label, name, icon, type = "text") => (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-      <label className="formLabel w-full sm:w-1/3 flex items-center">
-        {icon}
-        <span className="ml-2">{label}</span>
-      </label>
-      <input
-        type={type}
-        name={name}
-        value={outlet[name]}
-        onChange={handleChange}
-        required
-        className="formInput w-full sm:w-2/3"
-        placeholder={`Enter ${label.toLowerCase()}`}
-      />
-    </div>
-  );
-
   return (
-    <div className="bg-white py-10">
-      <div className="compactWidth">
+    <div className="fullWidth py-6">
+      <div className="containerWidth">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <h2 className="headingText">Add New Outlet</h2>
@@ -286,100 +97,179 @@ const AddOutlet = () => {
           </Link>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {renderInput(
-            "Outlet Name",
-            "outlet_name",
-            <FaUser className="text-green-500" />
-          )}
-          {renderInput(
-            "Location",
-            "location",
-            <FaBuilding className="text-blue-500" />
-          )}
-          {renderInput(
-            "Email",
-            "outlet_email",
-            <FaEnvelope className="text-indigo-500" />,
-            "email"
-          )}
-          {renderInput(
-            "Phone",
-            "outlet_phone",
-            <FaPhone className="text-green-500" />
-          )}
-
-          {renderInput(
-            "Street",
-            "street",
-            <FaHome className="text-teal-500" />
-          )}
-          {renderInput("City", "city", <FaHome className="text-teal-500" />)}
-          {renderInput("State", "state", <FaHome className="text-teal-500" />)}
-          {renderInput(
-            "Zip Code",
-            "zip_code",
-            <FaHome className="text-teal-500" />
-          )}
-          {renderInput(
-            "Country",
-            "country",
-            <FaHome className="text-teal-500" />
-          )}
-
-          {renderInput(
-            "Company Name",
-            "company_name",
-            <FaBuilding className="text-blue-500" />
-          )}
-          {renderInput(
-            "Registration Number",
-            "company_registration_number",
-            <FaBuilding className="text-blue-500" />
-          )}
-
-          {renderInput(
-            "Bank Name",
-            "bank_name",
-            <FaMoneyCheck className="text-purple-500" />
-          )}
-          {renderInput(
-            "Account Number",
-            "account_number",
-            <FaMoneyCheck className="text-purple-500" />
-          )}
-          {renderInput(
-            "IFSC Code",
-            "ifsc_code",
-            <FaMoneyCheck className="text-purple-500" />
-          )}
-
-          {/* Status Dropdown */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-            <label className="formLabel w-full sm:w-1/3">Status</label>
-            <select
-              name="status"
-              value={outlet.status}
-              onChange={handleChange}
-              className="formInput w-full sm:w-2/3"
+        {/* Layout */}
+        <DashboardLayout
+          left={
+            <LeftSidebarNav
+              navigate={navigate}
+              items={[
+                {
+                  label: "View All Outlets",
+                  icon: <FaBuilding className="text-blue-500" />,
+                  path: "/all-outlets",
+                },
+                {
+                  label: "Add New Outlet",
+                  icon: <FaUser className="text-green-500" />,
+                  path: "/add-outlet",
+                },
+              ]}
+            />
+          }
+          right={
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white rounded-lg shadow-sm p-6 space-y-6"
             >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
+              <ModernTextInput
+                label="Outlet Name"
+                icon={<FaUser className="text-green-500" />}
+                value={outlet.outlet_name}
+                onChange={handleChange}
+                name="outlet_name"
+                required
+              />
 
-          {/* Submit */}
-          <div className="pt-4 flex justify-end">
-            <button
-              type="submit"
-              className="primaryBtn flex items-center gap-2 px-4 py-2"
-            >
-              <MdSave />
-              Add Outlet
-            </button>
-          </div>
-        </form>
+              <ModernTextInput
+                label="Location"
+                icon={<FaBuilding className="text-blue-500" />}
+                value={outlet.location}
+                onChange={handleChange}
+                name="location"
+                required
+              />
+
+              <ModernTextInput
+                label="Email"
+                type="email"
+                icon={<FaEnvelope className="text-indigo-500" />}
+                value={outlet.outlet_email}
+                onChange={handleChange}
+                name="outlet_email"
+                required
+              />
+
+              <ModernTextInput
+                label="Phone"
+                icon={<FaPhone className="text-green-500" />}
+                value={outlet.outlet_phone}
+                onChange={handleChange}
+                name="outlet_phone"
+                required
+              />
+
+              <ModernTextInput
+                label="Street"
+                icon={<FaHome className="text-teal-500" />}
+                value={outlet.street}
+                onChange={handleChange}
+                name="street"
+              />
+              <ModernTextInput
+                label="City"
+                icon={<FaHome className="text-teal-500" />}
+                value={outlet.city}
+                onChange={handleChange}
+                name="city"
+              />
+              <ModernTextInput
+                label="State"
+                icon={<FaHome className="text-teal-500" />}
+                value={outlet.state}
+                onChange={handleChange}
+                name="state"
+              />
+              <ModernTextInput
+                label="Zip Code"
+                icon={<FaHome className="text-teal-500" />}
+                value={outlet.zip_code}
+                onChange={handleChange}
+                name="zip_code"
+              />
+              <ModernTextInput
+                label="Country"
+                icon={<FaHome className="text-teal-500" />}
+                value={outlet.country}
+                onChange={handleChange}
+                name="country"
+              />
+
+              <ModernTextInput
+                label="Company Name"
+                icon={<FaBuilding className="text-blue-500" />}
+                value={outlet.company_name}
+                onChange={handleChange}
+                name="company_name"
+              />
+              <ModernTextInput
+                label="Registration Number"
+                icon={<FaBuilding className="text-blue-500" />}
+                value={outlet.company_registration_number}
+                onChange={handleChange}
+                name="company_registration_number"
+              />
+
+              <ModernTextInput
+                label="Bank Name"
+                icon={<FaMoneyCheck className="text-purple-500" />}
+                value={outlet.bank_name}
+                onChange={handleChange}
+                name="bank_name"
+              />
+              <ModernTextInput
+                label="Account Number"
+                icon={<FaMoneyCheck className="text-purple-500" />}
+                value={outlet.account_number}
+                onChange={handleChange}
+                name="account_number"
+              />
+              <ModernTextInput
+                label="IFSC Code"
+                icon={<FaMoneyCheck className="text-purple-500" />}
+                value={outlet.ifsc_code}
+                onChange={handleChange}
+                name="ifsc_code"
+              />
+
+              {/* Image Upload */}
+              <div className="w-full">
+                <label className="formLabel mb-1 text-sm font-medium text-gray-700">
+                  Outlet Image
+                </label>
+                <ModernFileInput
+                  onFileSelect={(file) => setOutletImage(file)}
+                />
+              </div>
+
+              {/* Status */}
+              <div className="w-full">
+                <label className="formLabel mb-1 text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <select
+                  name="status"
+                  value={outlet.status}
+                  onChange={handleChange}
+                  className="formInput w-full"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+
+              {/* Submit */}
+              <div className="flex justify-end pt-4">
+                <button
+                  type="submit"
+                  className="primaryBtn flex items-center gap-2"
+                >
+                  <MdSave />
+                  Add Outlet
+                </button>
+              </div>
+            </form>
+          }
+        />
       </div>
     </div>
   );

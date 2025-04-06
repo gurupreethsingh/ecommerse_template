@@ -18,6 +18,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    setDropdownOpen(false); // Close dropdown
     logout();
     navigate("/login");
   };
@@ -165,6 +166,7 @@ export default function Header() {
                     </button>
                     <button
                       onClick={() => {
+                        setDropdownOpen(false);
                         handleLogout();
                         setMobileMenuOpen(false);
                       }}

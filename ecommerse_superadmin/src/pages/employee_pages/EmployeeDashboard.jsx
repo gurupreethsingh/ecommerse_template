@@ -3,23 +3,25 @@ import {
   FaThList,
   FaThLarge,
   FaTh,
-  FaSearch,
   FaTasks,
-  FaUserTie,
   FaUserCog,
   FaCalendarAlt,
   FaClock,
   FaFileAlt,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import PageHeading from "../../components/common_components/PageHeading";
+
+import SearchBar from "../../components/common_components/SearchBar";
+import LeftSidebarNav from "../../components/common_components/LeftSidebarNav";
+import DashboardCard from "../../components/common_components/DashboardCard";
+import DashboardLayout from "../../components/common_components/DashboardLayout";
+import stopwords from "../../components/common_components/stopwords.jsx";
 
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const [view, setView] = useState("grid");
   const [search, setSearch] = useState("");
 
-  // Dummy cards for employee dashboard
   const dummyCards = [
     {
       title: "Assigned Tasks",
@@ -51,52 +53,6 @@ const EmployeeDashboard = () => {
     },
   ];
 
-  const stopwords = [
-    "show",
-    "me",
-    "all",
-    "of",
-    "the",
-    "please",
-    "find",
-    "list",
-    "give",
-    "i",
-    "want",
-    "to",
-    "see",
-    "display",
-    "get",
-    "need",
-    "for",
-    "on",
-    "in",
-    "at",
-    "a",
-    "an",
-    "this",
-    "that",
-    "those",
-    "these",
-    "my",
-    "your",
-    "their",
-    "our",
-    "from",
-    "and",
-    "or",
-    "by",
-    "can",
-    "you",
-    "let",
-    "us",
-    "would",
-    "should",
-    "could",
-    "will",
-    "just",
-  ];
-
   const filteredCards =
     search.trim() === ""
       ? dummyCards
@@ -117,7 +73,7 @@ const EmployeeDashboard = () => {
       <div className="containerWidth">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center flex-wrap mb-6 gap-4">
-          <h1 className="headingText">Dashboard Overview</h1>
+          <h1 className="headingText">Employee Dashboard</h1>
           <div className="flex items-center flex-wrap gap-3">
             <FaThList
               className={`text-xl cursor-pointer ${
@@ -137,24 +93,20 @@ const EmployeeDashboard = () => {
               }`}
               onClick={() => setView("grid")}
             />
-            <div className="relative w-full sm:w-64">
-              <FaSearch className="absolute left-3 top-3 text-gray-400" />
-              <input
-                type="text"
-                className="formInput pl-10"
-                placeholder="Search cards..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
+            <SearchBar
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search cards..."
+            />
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Sidebar */}
-          <aside className="w-full md:w-1/4">
-            <nav className="rounded-lg overflow-hidden border-gray-200">
-              {[
+        {/* Layout */}
+        <DashboardLayout
+          left={
+            <LeftSidebarNav
+              navigate={navigate}
+              items={[
                 {
                   label: "My Profile",
                   icon: <FaUserCog className="text-indigo-600" />,
@@ -180,21 +132,10 @@ const EmployeeDashboard = () => {
                   icon: <FaClock className="text-orange-500" />,
                   path: "/working-hours",
                 },
-              ].map((item, index) => (
-                <button
-                  key={index}
-                  onClick={() => navigate(item.path)}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold shadow-sm text-gray-700 hover:shadow-lg hover:bg-green-50 rounded border-b"
-                >
-                  <span className="text-lg">{item.icon}</span>
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-          </aside>
-
-          {/* Main Cards */}
-          <main className="w-full md:w-3/4">
+              ]}
+            />
+          }
+          right={
             <div
               className={`${
                 view === "grid"
@@ -205,39 +146,16 @@ const EmployeeDashboard = () => {
               }`}
             >
               {filteredCards.map((card, index) => (
-                <div
+                <DashboardCard
                   key={index}
+                  card={card}
+                  view={view}
                   onClick={() => navigate(card.link)}
-                  className={`rounded cursor-pointer transition duration-200 hover:shadow-md ${
-                    card.bgColor
-                  } ${
-                    view === "card"
-                      ? "p-6 flex flex-col items-center justify-between text-center shadow"
-                      : view === "grid"
-                      ? "p-4"
-                      : "p-4 flex items-center justify-between"
-                  }`}
-                >
-                  <div
-                    className={
-                      view === "list"
-                        ? "flex items-center gap-4"
-                        : "flex items-center justify-between w-full"
-                    }
-                  >
-                    <div>
-                      <p className="subHeadingText mb-1">{card.title}</p>
-                      <p className="text-xl font-bold text-gray-800">
-                        {card.value}
-                      </p>
-                    </div>
-                    <div>{card.icon}</div>
-                  </div>
-                </div>
+                />
               ))}
             </div>
-          </main>
-        </div>
+          }
+        />
       </div>
     </div>
   );

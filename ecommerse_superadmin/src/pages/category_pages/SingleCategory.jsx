@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import globalBackendRoute from "../../config/Config";
+import ModernFileInput from "../../components/common_components/ModernFileInput";
+import ModernTextInput from "../../components/common_components/MordernTextInput";
 
 export default function SingleCategory() {
   const [categoryData, setCategoryData] = useState(null);
@@ -103,32 +105,29 @@ export default function SingleCategory() {
               label="Category Name"
               value={
                 editMode ? (
-                  <input
-                    type="text"
+                  <ModernTextInput
                     value={updatedCategoryName}
                     onChange={(e) => setUpdatedCategoryName(e.target.value)}
-                    className="formInput"
                   />
                 ) : (
                   categoryData.category_name
                 )
               }
             />
+
             <CategoryField
               icon={<FaCalendarAlt className="text-green-600" />}
               label="Created At"
               value={new Date(categoryData.createdAt).toLocaleDateString()}
             />
+
             {editMode && (
               <CategoryField
                 icon={<FaImage className="text-indigo-600" />}
                 label="New Image"
                 value={
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setNewCategoryImage(e.target.files[0])}
-                    className="formInput"
+                  <ModernFileInput
+                    onFileSelect={(file) => setNewCategoryImage(file)}
                   />
                 }
               />

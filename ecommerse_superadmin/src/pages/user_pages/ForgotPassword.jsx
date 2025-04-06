@@ -43,73 +43,85 @@ const ForgotPassword = () => {
 
   return (
     <div className="compactWidth py-12">
+      {/* Header */}
       <div className="text-center">
-        <FaKey className="iconPrimary" size={48} />
+        <FaKey className="iconPrimary mx-auto" size={48} />
         <h2 className="headingTextMobile lg:headingText mt-4">
           Forgot Password
         </h2>
       </div>
 
-      <div className="mt-10">
-        <form className="space-y-6">
-          <div>
-            <label htmlFor="email" className="formLabel flex items-center">
-              <FaEnvelope className="text-blue-500 mr-2" /> Email address
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="formInput mt-2"
-              autoComplete="email"
-            />
-          </div>
+      {/* Form */}
+      <form className="mt-10 space-y-6">
+        {/* Email */}
+        <div>
+          <label htmlFor="email" className="formLabel flex items-center gap-2">
+            <FaEnvelope className="text-blue-500" />
+            Email address
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            className="formInput mt-2"
+            placeholder="Enter your registered email"
+          />
+        </div>
 
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={handleSendOtp}
-              className="primaryBtn w-auto px-6"
-            >
-              Send OTP
-            </button>
-          </div>
+        {/* Send OTP Button */}
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={handleSendOtp}
+            className="primaryBtn w-auto px-6"
+          >
+            Send OTP
+          </button>
+        </div>
 
-          {otpSent && (
-            <>
-              <div>
-                <label htmlFor="otp" className="formLabel flex items-center">
-                  <FaKey className="text-purple-500 mr-2" /> OTP
-                </label>
-                <input
-                  id="otp"
-                  name="otp"
-                  type="text"
-                  required
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="Enter OTP"
-                  className="formInput mt-2"
-                />
-              </div>
-              <div className="text-center">
-                <button
-                  type="button"
-                  onClick={handleVerifyOtp}
-                  className="primaryBtn w-auto px-6"
-                >
-                  Verify OTP
-                </button>
-              </div>
-            </>
-          )}
+        {/* OTP Input */}
+        {otpSent && (
+          <>
+            <div>
+              <label
+                htmlFor="otp"
+                className="formLabel flex items-center gap-2"
+              >
+                <FaKey className="text-purple-500" />
+                OTP
+              </label>
+              <input
+                id="otp"
+                name="otp"
+                type="text"
+                required
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter OTP"
+                className="formInput mt-2"
+              />
+            </div>
 
-          {error && <p className="errorText">{error}</p>}
-        </form>
-      </div>
+            {/* Verify OTP Button */}
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={handleVerifyOtp}
+                className="primaryBtn w-auto px-6"
+              >
+                Verify OTP
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Error Message */}
+        {error && <p className="errorText text-center">{error}</p>}
+      </form>
     </div>
   );
 };
