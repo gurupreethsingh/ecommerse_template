@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaTh,
   FaThLarge,
@@ -7,6 +7,7 @@ import {
   FaUsers,
   FaClipboardList,
   FaPlus,
+  FaCog,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
