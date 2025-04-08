@@ -2,15 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import globalBackendRoute from "../../config/Config";
-import {
-  FaUser,
-  FaEnvelope,
-  FaPhone,
-  FaBuilding,
-  FaBox,
-  FaStore,
-  FaEdit,
-} from "react-icons/fa";
+import { FaUser, FaEnvelope, FaPhone, FaBuilding, FaBox } from "react-icons/fa";
 
 export default function SingleOutlet() {
   const { outletId } = useParams();
@@ -21,34 +13,48 @@ export default function SingleOutlet() {
   const [updatedOutlet, setUpdatedOutlet] = useState({});
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchOutletDetails = async () => {
       try {
         const response = await axios.get(
           `${globalBackendRoute}/api/get-outlet-by-id/${outletId}`
         );
-        setOutlet(response.data);
-        setUpdatedOutlet(response.data);
+        if (isMounted) {
+          setOutlet(response.data);
+          setUpdatedOutlet(response.data);
+        }
       } catch (error) {
         console.error("Error fetching outlet details:", error);
       }
     };
-    fetchOutletDetails();
-  }, [outletId]);
 
-  useEffect(() => {
     const fetchOutletProducts = async () => {
       try {
         const response = await axios.get(
           `${globalBackendRoute}/api/products-by-outlet/${outletId}`
         );
-        setProducts(response.data);
+        if (isMounted) {
+          setProducts(response.data);
+        }
       } catch (error) {
-        console.error("Error fetching outlet products:", error);
+        if (error.response?.status === 404) {
+          console.warn("No products found for this outlet.");
+          setProducts([]);
+        } else {
+          console.error("Error fetching outlet products:", error);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
+
+    fetchOutletDetails();
     fetchOutletProducts();
+
+    return () => {
+      isMounted = false;
+    };
   }, [outletId]);
 
   const handleUpdateOutlet = async () => {
@@ -72,7 +78,8 @@ export default function SingleOutlet() {
 
   if (loading)
     return <div className="text-center py-10">Loading outlet details...</div>;
-  if (!outlet) return <div className="text-center py-10">Outlet not found</div>;
+  if (!outlet)
+    return <div className="text-center py-10">Outlet not found.</div>;
 
   const fields = [
     {
@@ -100,6 +107,7 @@ export default function SingleOutlet() {
   return (
     <div className="bg-white py-10">
       <div className="containerWidth">
+        {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center flex-wrap gap-4 mb-6">
           <h2 className="headingText flex items-center gap-2">
             Outlet Details
@@ -144,6 +152,7 @@ export default function SingleOutlet() {
                   </dd>
                 </div>
               ))}
+
               <div className="pt-4 flex justify-end">
                 <button
                   onClick={() =>

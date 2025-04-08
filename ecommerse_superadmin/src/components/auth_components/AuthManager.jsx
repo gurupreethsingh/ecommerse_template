@@ -25,7 +25,6 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("token");
     if (token) {
       const decoded = decodeToken(token);
-      console.log("Decoded Token:", decoded); // <-- Add this
       if (decoded) {
         setUser(decoded);
         setIsLoggedIn(true);
