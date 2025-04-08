@@ -2,7 +2,7 @@ const DashboardCard = ({ card, view, onClick }) => {
   return (
     <div
       onClick={onClick}
-      className={`cursor-pointer rounded transition duration-200 hover:shadow-md ${
+      className={`cursor-pointer rounded transition duration-200 shodow-sm hover:shadow-lg ${
         card.bgColor
       } ${
         view === "card"

@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
+
 import {
   FaTh,
   FaThLarge,
@@ -22,14 +24,15 @@ const VendorDashboard = () => {
   const [view, setView] = useState("grid");
   const [search, setSearch] = useState("");
   const [userId, setUserId] = useState(null);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return navigate("/my-account");
+    if (!token) return navigate("/login");
     try {
       const decoded = jwtDecode(token);
       setUserId(decoded.id);
     } catch (error) {
-      navigate("/my-account");
+      navigate("/login");
     }
   }, [navigate]);
 

@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("token");
     if (token) {
       const decoded = decodeToken(token);
+      console.log("Decoded Token:", decoded); // <-- Add this
       if (decoded) {
         setUser(decoded);
         setIsLoggedIn(true);
@@ -87,7 +88,7 @@ export const PrivateRoute = ({ children, allowedRoles = [] }) => {
   return children;
 };
 
-// 🌐 Updated Public Route with Role-Based Redirection
+// Updated Public Route with Role-Based Redirection
 export const PublicRoute = ({ children }) => {
   const { isLoggedIn, user } = useContext(AuthContext);
 

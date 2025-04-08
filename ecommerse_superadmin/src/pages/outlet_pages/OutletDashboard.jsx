@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 import {
   FaTh,
   FaThLarge,
@@ -25,12 +26,12 @@ const OutletDashboard = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return navigate("/my-account");
+    if (!token) return navigate("/login");
     try {
       const decoded = jwtDecode(token);
       setUserId(decoded.id);
     } catch (error) {
-      navigate("/my-account");
+      navigate("/login");
     }
   }, [navigate]);
 
