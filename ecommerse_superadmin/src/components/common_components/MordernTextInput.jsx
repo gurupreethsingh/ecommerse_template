@@ -1,3 +1,4 @@
+// MordernTextInput.jsx
 import React from "react";
 
 export default function ModernTextInput({
@@ -9,14 +10,18 @@ export default function ModernTextInput({
   placeholder = "",
   required = false,
   className = "",
+  name, // ✅ Add name prop
 }) {
   return (
     <div className="w-full">
-      <label className="formLabel flex items-center gap-2 mb-1 text-sm font-medium text-gray-700">
-        {icon}
-        {label}
-      </label>
+      {label && (
+        <label className="formLabel flex items-center gap-2 mb-1 text-sm font-medium text-gray-700">
+          {icon}
+          {label}
+        </label>
+      )}
       <input
+        name={name} // ✅ Bind the name here
         type={type}
         value={value}
         onChange={onChange}

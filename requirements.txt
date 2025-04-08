@@ -1,6 +1,8 @@
 Ecommerse application requirements : 
-
-User story :
+-------------------------------------------------------------------------------------------------
+-> Login page requirements
+-------------------------------------------------------------------------------------------------
+User story : (when he is not logged in)
 
 1. when user enters the homepage url login page should open. 
 2. there will  be only logo and login link at the top of the header.
@@ -11,3 +13,7 @@ User story :
 policies heading. will have links to PrivacyPolicy , and Return policy, 
 7. At the right side of the footer , address should get displayed, 
 8. lastly, at the bottom of the footer, copy rigth symbol and ecoders trademark, All rigghts reserved 
+
+-------------------------------------------------------------------------------------------------
+-> outlet page requirements
+-------------------------------------------------------------------------------------------------
