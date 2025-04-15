@@ -56,7 +56,7 @@ app.use((req, res, next) => {
 });
 
 // 8. port number 3006
-const PORT = process.env.PORT || 3007;
+const PORT = process.env.PORT || 3010;
 
 // 9 . connect to mongodb.
 mongoose
