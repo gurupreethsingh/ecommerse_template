@@ -46,6 +46,7 @@ export default function Header() {
       { path: "/home", name: "Home" },
       { path: "/about-us", name: "About Us" },
       { path: "/contact-us", name: "Contact Us" },
+      { path: "/all-blogs", name: "Blogs" },
     ];
     if (isLoggedIn) {
       links.push({ path: dashboardRoute, name: "Dashboard" });

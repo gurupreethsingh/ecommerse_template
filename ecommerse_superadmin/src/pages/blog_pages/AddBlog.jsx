@@ -5,7 +5,8 @@ import { jwtDecode } from "jwt-decode";
 import globalBackendRoute from "../../config/Config";
 
 export default function AddBlog() {
-  const [formData, setFormData] = useState({
+
+  const initialFormData = {
     title: "",
     body: "",
     summary: "",
@@ -15,7 +16,9 @@ export default function AddBlog() {
     metaDescription: "",
     published: false,
     featuredImage: null,
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
   const [authorId, setAuthorId] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -72,7 +75,8 @@ export default function AddBlog() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       alert("✅ Blog added successfully!");
-      navigate("/all-blogs", { replace: true });
+      setFormData(initialFormData);
+      navigate("/add-blog", { replace: true });
     } catch (error) {
       console.error("Error adding blog:", error);
       alert("❌ Failed to add blog. Please try again.");
