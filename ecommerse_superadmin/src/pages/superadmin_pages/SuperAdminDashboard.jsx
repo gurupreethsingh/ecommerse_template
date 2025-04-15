@@ -30,15 +30,17 @@ const SuperadminDashboard = () => {
   const [search, setSearch] = useState("");
   const [userId, setUserId] = useState(null);
   const [view, setView] = useState("grid");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [cardsPerPage, setCardsPerPage] = useState(8);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return navigate("/my-account");
+    if (!token) return navigate("/login");
     try {
       const decoded = jwtDecode(token);
       setUserId(decoded.id);
     } catch (error) {
-      navigate("/my-account");
+      navigate("/login");
     }
   }, [navigate]);
 
@@ -56,6 +58,32 @@ const SuperadminDashboard = () => {
       }
     };
     fetchCounts();
+  }, []);
+
+  useEffect(() => {
+    const calculateCardsPerPage = () => {
+      const availableHeight = window.innerHeight - 300;
+      const cardHeight = 220;
+      const columns =
+        window.innerWidth < 640
+          ? 4
+          : window.innerWidth < 768
+          ? 5
+          : window.innerWidth < 1024
+          ? 6
+          : 8;
+      const rows = Math.floor(availableHeight / cardHeight);
+      return rows * columns;
+    };
+
+    const updateLimit = () => {
+      setCardsPerPage(calculateCardsPerPage());
+      setCurrentPage(1);
+    };
+
+    updateLimit();
+    window.addEventListener("resize", updateLimit);
+    return () => window.removeEventListener("resize", updateLimit);
   }, []);
 
   const userRoleCards = Object.entries(counts).map(([key, value]) => {
@@ -110,12 +138,22 @@ const SuperadminDashboard = () => {
           );
         });
 
+  const totalPages = Math.ceil(filteredCards.length / cardsPerPage);
+  const paginatedCards = filteredCards.slice(
+    (currentPage - 1) * cardsPerPage,
+    currentPage * cardsPerPage
+  );
+
   return (
     <div className="fullWidth py-6">
       <div className="containerWidth">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center flex-wrap mb-6 gap-4">
-          <h1 className="headingText">Superadmin Dashboard</h1>
+          <div>
+            <h1 className="headingText">Superadmin Dashboard</h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Showing {paginatedCards.length} of {filteredCards.length} cards
+            </p>
+          </div>
           <div className="flex items-center flex-wrap gap-3">
             <FaThList
               className={`text-xl cursor-pointer ${
@@ -143,7 +181,6 @@ const SuperadminDashboard = () => {
           </div>
         </div>
 
-        {/* Layout */}
         <DashboardLayout
           left={
             <LeftSidebarNav
@@ -179,27 +216,56 @@ const SuperadminDashboard = () => {
                   icon: <FaUserPlus className="text-teal-600" />,
                   path: "/add-employee",
                 },
+                {
+                  label: "Add Blog",
+                  icon: <FaUserPlus className="text-indigo-800" />,
+                  path: "/add-blog",
+                },
               ]}
             />
           }
           right={
-            <div
-              className={`${
-                view === "grid"
-                  ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
-                  : view === "card"
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                  : "space-y-4"
-              }`}
-            >
-              {filteredCards.map((card, index) => (
-                <DashboardCard
-                  key={index}
-                  card={card}
-                  view={view}
-                  onClick={() => navigate(card.link)}
-                />
-              ))}
+            <div>
+              <div
+                className={`${
+                  view === "grid"
+                    ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
+                    : view === "card"
+                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                    : "space-y-4"
+                }`}
+              >
+                {paginatedCards.map((card, index) => (
+                  <DashboardCard
+                    key={index}
+                    card={card}
+                    view={view}
+                    onClick={() => navigate(card.link)}
+                  />
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-8 gap-4 flex-wrap">
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((p) => p - 1)}
+                    className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-gray-700 font-medium">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage((p) => p + 1)}
+                    className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
           }
         />
