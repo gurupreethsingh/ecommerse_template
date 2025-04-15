@@ -10,9 +10,9 @@ User story : (when he is not logged in)
 4. Along with the password label. there will be forgot password link. 
 5. after the sign in button. Dont have an Account? register here , link should be displayed. 
 6. footer will have follow us (heading social media links) containing, fb instagram twitter and linked in links. 
-policies heading. will have links to PrivacyPolicy , and Return policy, 
-7. At the right side of the footer , address should get displayed, 
-8. lastly, at the bottom of the footer, copy rigth symbol and ecoders trademark, All rigghts reserved 
+7. policies heading. will have links to PrivacyPolicy , and Return policy, 
+8. At the right side of the footer , address should get displayed, 
+9. lastly, at the bottom of the footer, copy rigth symbol and ecoders trademark, All rigghts reserved 
 
 -------------------------------------------------------------------------------------------------
 -> outlet page requirements
