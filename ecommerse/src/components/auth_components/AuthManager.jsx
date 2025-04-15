@@ -67,7 +67,7 @@ export const PrivateRoute = ({ children, allowedRoles = [] }) => {
   if (!isLoggedIn) {
     return (
       <Navigate
-        to="/login"
+        to="/home"
         replace
         state={{ message: "You need to log in to access this page." }}
       />
@@ -93,19 +93,8 @@ export const PublicRoute = ({ children }) => {
 
   if (isLoggedIn && user?.role) {
     switch (user.role) {
-      case "admin":
-        return <Navigate to="/admin-dashboard" />;
-      case "superadmin":
-        return <Navigate to="/superadmin-dashboard" />;
-      case "employee":
-        return <Navigate to="/employee-dashboard" />;
-      case "vendor":
-        return <Navigate to="/vendor-dashboard" />;
-      case "delivery_agent":
-        return <Navigate to="/delivery-agent-dashboard" />;
-      case "outlet":
-        return <Navigate to="/outlet-dashboard" />;
       case "user":
+        return <Navigate to="/dashboard" />;
       default:
         return <Navigate to="/dashboard" />;
     }
