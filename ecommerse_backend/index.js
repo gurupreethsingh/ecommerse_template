@@ -11,10 +11,13 @@ const bcrypt = require("bcrypt");
 
 const userRoutes = require(".//routes/UserRoutes");
 const activityRoutes = require("./routes/ActivityRoutes");
+
+
+const entityCountRoutes = require("./routes/EntityCountRoutes");
 const categoryRoutes = require("./routes/CategoryRoutes");
+const subCategoryRoutes = require("./routes/SubCategoryRoutes")
 const outletRoutes = require("./routes/OutletRoutes");
 const vendorRoutes = require("./routes/VendorRoutes");
-const entityCountRoutes = require("./routes/EntityCountRoutes");
 
 // 2. give a name to your api backend. app = express()
 dotenv.config();
@@ -39,6 +42,7 @@ app.use("/api", categoryRoutes);
 app.use("/api", outletRoutes);
 app.use("/api", vendorRoutes);
 app.use("/api", entityCountRoutes);
+app.use("/api" , subCategoryRoutes);
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -50,7 +54,7 @@ app.use((req, res, next) => {
 });
 
 // 8. port number 3006
-const PORT = process.env.PORT || 3007;
+const PORT = process.env.PORT;
 
 // 9 . connect to mongodb.
 mongoose
@@ -63,7 +67,6 @@ mongoose
   });
 
 // 10. app.listen(port)
-
 app.listen(PORT, () => {
   console.log(`Connected to server successfully at port number ${PORT}`);
 });
