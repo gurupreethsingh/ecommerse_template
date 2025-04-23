@@ -105,9 +105,7 @@ export default function UpdateProfile() {
   };
 
   const getImageUrl = (avatar) => {
-    if (!avatar || avatar === "undefined" || avatar === "null") {
-      return "https://placehold.co/150x150?text=No+Image";
-    }
+    if (!avatar) return "https://via.placeholder.com/150";
     return `${globalBackendRoute}/${avatar.replace(/\\/g, "/")}`;
   };
 
@@ -120,16 +118,12 @@ export default function UpdateProfile() {
             alt={formData.name}
             className="w-full h-full object-cover rounded-xl border bg-gray-100"
             onError={(e) => {
-              // Prevent infinite fallback loop
-              if (!e.currentTarget.src.includes("placehold.co")) {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src =
-                  "https://placehold.co/150x150?text=No+Image";
-              }
+              e.currentTarget.onerror = null;
+              e.currentTarget.src =
+                "https://via.placeholder.com/150?text=No+Image";
             }}
           />
         </div>
-
         <form onSubmit={handleSubmit} className="w-full">
           <h2 className="subHeadingTextMobile lg:subHeadingText mb-4">
             Update Profile

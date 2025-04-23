@@ -1,0 +1,11 @@
+/* App.css or index.css */
+html,
+body,
+#root {
+      height: 100%;
+}
+
+body {
+      display: flex;
+      flex-direction: column;
+}

@@ -26,12 +26,12 @@ const DeliveryAgentDashboard = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return navigate("/login");
+    if (!token) return navigate("/my-account");
     try {
       const decoded = jwtDecode(token);
       setUserId(decoded.id);
     } catch (error) {
-      navigate("/login");
+      navigate("/my-account");
     }
   }, [navigate]);
 

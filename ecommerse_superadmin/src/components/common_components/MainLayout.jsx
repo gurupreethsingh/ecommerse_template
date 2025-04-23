@@ -37,11 +37,6 @@ import SingleVendor from "../../pages/vendor_pages/SingleVendor";
 import AddOutlet from "../../pages/outlet_pages/AddOutlet";
 import SingleOutlet from "../../pages/outlet_pages/SingleOutlet";
 import AllOutlets from "../../pages/outlet_pages/AllOutlets";
-// contact routes. 
-import AllMessages from "../../pages/contact_pages/AllMessages";
-import ReplyMessage from "../../pages/contact_pages/ReplyMessage";
-import AllReplies from "../../pages/contact_pages/AllReplies";
-import AddBlog from "../../pages/blog_pages/AddBlog";
 
 const MainLayout = () => {
   return (
@@ -89,51 +84,6 @@ const MainLayout = () => {
               </PrivateRoute>
             }
           />
-
-<Route
-            path="/all-messages"
-            element={
-              <PrivateRoute allowedRoles={[ "superadmin"]}>
-                <PageTitle title="All Messages">
-                  <AllMessages />
-                </PageTitle>
-              </PrivateRoute>
-            }
-          />
-
-<Route
-            path="/reply-message/:id"
-            element={
-              <PrivateRoute allowedRoles={[ "superadmin"]}>
-                <PageTitle title="Reply Message">
-                  <ReplyMessage />
-                </PageTitle>
-              </PrivateRoute>
-            }
-          />
-
-<Route
-            path="/all-replies"
-            element={
-              <PrivateRoute allowedRoles={[ "superadmin"]}>
-                <PageTitle title="All Replies">
-                  <AllReplies />
-                </PageTitle>
-              </PrivateRoute>
-            }
-          />
-
-<Route
-            path="/add-blog"
-            element={
-              <PrivateRoute allowedRoles={[ "superadmin"]}>
-                <PageTitle title="Add Blog">
-                  <AddBlog />
-                </PageTitle>
-              </PrivateRoute>
-            }
-          />
-
           <Route
             path="/about-us"
             element={
@@ -144,8 +94,6 @@ const MainLayout = () => {
               </PrivateRoute>
             }
           />
-
-
           <Route
             path="/login"
             element={

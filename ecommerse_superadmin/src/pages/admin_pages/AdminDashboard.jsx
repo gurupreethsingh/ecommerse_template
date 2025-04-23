@@ -1,131 +1,154 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import {
-  FaThList,
-  FaThLarge,
-  FaTh,
+  FaUsers,
+  FaUserCheck,
   FaCog,
-  FaPlus,
   FaBoxOpen,
   FaStore,
   FaBuilding,
-  FaUserPlus,
+  FaPlus,
+  FaThList,
+  FaThLarge,
+  FaTh,
+  FaSearch,
+  FaBoxes,
+  FaLayerGroup,
 } from "react-icons/fa";
-
-import SearchBar from "../../components/common_components/SearchBar";
-import LeftSidebarNav from "../../components/common_components/LeftSidebarNav";
-import DashboardCard from "../../components/common_components/DashboardCard";
-import DashboardLayout from "../../components/common_components/DashboardLayout";
+import globalBackendRoute from "../../config/Config";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const [counts, setCounts] = useState({});
+  const [entities, setEntities] = useState({});
   const [search, setSearch] = useState("");
   const [userId, setUserId] = useState(null);
   const [view, setView] = useState("grid");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [cardsPerPage, setCardsPerPage] = useState(8);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return navigate("/login");
+    if (!token) {
+      navigate("/my-account");
+      return;
+    }
     try {
       const decoded = jwtDecode(token);
       setUserId(decoded.id);
     } catch (error) {
-      navigate("/login");
+      navigate("/my-account");
     }
   }, [navigate]);
 
   useEffect(() => {
-    const calculateCardsPerPage = () => {
-      const availableHeight = window.innerHeight - 300;
-      const cardHeight = 220;
-      const columns =
-        window.innerWidth < 640
-          ? 1
-          : window.innerWidth < 768
-          ? 2
-          : window.innerWidth < 1024
-          ? 3
-          : 4;
-      const rows = Math.floor(availableHeight / cardHeight);
-      return rows * columns;
+    const fetchCounts = async () => {
+      try {
+        const [roleRes, entityRes] = await Promise.all([
+          axios.get(`${globalBackendRoute}/api/getUserCountsByRole`),
+          axios.get(`${globalBackendRoute}/api/get-entity-counts`),
+        ]);
+        setCounts(roleRes.data);
+        setEntities(entityRes.data);
+      } catch (err) {
+        console.error("Failed to fetch counts", err);
+      }
     };
-
-    const updateLimit = () => {
-      setCardsPerPage(calculateCardsPerPage());
-      setCurrentPage(1);
-    };
-
-    updateLimit();
-    window.addEventListener("resize", updateLimit);
-    return () => window.removeEventListener("resize", updateLimit);
+    fetchCounts();
   }, []);
 
-  // Admin-defined cards only (static setup)
-  const staticCards = [
-    {
-      title: "Manage Categories",
-      value: 0,
-      link: "#",
-      icon: <FaBoxOpen className="text-green-600 text-3xl" />,
-      bgColor: "bg-green-50 border border-green-200",
-    },
-    {
-      title: "Manage Products",
-      value: 0,
-      link: "#",
-      icon: <FaStore className="text-indigo-600 text-3xl" />,
-      bgColor: "bg-indigo-50 border border-indigo-200",
-    },
-    {
-      title: "Manage Vendors",
-      value: 0,
-      link: "#",
-      icon: <FaBuilding className="text-orange-600 text-3xl" />,
-      bgColor: "bg-orange-50 border border-orange-200",
-    },
-    {
-      title: "Manage Outlets",
-      value: 0,
-      link: "#",
-      icon: <FaUserPlus className="text-purple-600 text-3xl" />,
-      bgColor: "bg-purple-50 border border-purple-200",
-    },
+  const iconMap = {
+    admin: <FaUserCheck className="text-indigo-600 text-3xl" />,
+    user: <FaUsers className="text-green-600 text-3xl" />,
+    vendor: <FaStore className="text-orange-600 text-3xl" />,
+    outlet: <FaBuilding className="text-blue-500 text-3xl" />,
+    category: <FaLayerGroup className="text-yellow-600 text-3xl" />,
+    product: <FaBoxes className="text-green-600 text-3xl" />,
+  };
+
+  const bgColorLogic = (value) => {
+    if (value < 5) return "bg-red-100 animate-pulse border border-red-400";
+    if (value < 10) return "bg-yellow-100 border border-yellow-400";
+    return "bg-gray-100";
+  };
+
+  const userRoleCards = Object.entries(counts).map(([key, value]) => {
+    if (!value || value === 0) return null;
+    const title = key
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+    return {
+      title,
+      value,
+      link: `/all-${key}`,
+      icon: iconMap[key] || <FaUsers className="text-gray-600 text-3xl" />,
+      bgColor: bgColorLogic(value),
+    };
+  });
+
+  const entityCards = Object.entries(entities).map(([key, value]) => {
+    if (!value || value === 0) return null;
+    const title = key
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+    const pathMap = {
+      category: "/all-categories",
+      product: "/all-added-products",
+      vendor: "/all-vendors",
+      outlet: "/all-outlets",
+    };
+    return {
+      title,
+      value,
+      link: pathMap[key] || "/",
+      icon: iconMap[key] || <FaBoxes className="text-gray-600 text-3xl" />,
+      bgColor: bgColorLogic(value),
+    };
+  });
+
+  const allCards = [...userRoleCards, ...entityCards].filter(Boolean);
+
+  const stopwords = [
+    "show",
+    "me",
+    "all",
+    "of",
+    "the",
+    "users",
+    "with",
+    "please",
+    "find",
+    "list",
+    "give",
+    "i",
+    "want",
+    "to",
+    "see",
+    "display",
+    "get",
+    "need",
   ];
 
   const filteredCards =
     search.trim() === ""
-      ? staticCards
-      : staticCards.filter((card) => {
-          const text = `${card.title}`.toLowerCase();
+      ? allCards
+      : allCards.filter((card) => {
+          const text = `${card.title} ${card.value}`.toLowerCase();
           const queryWords = search
             .toLowerCase()
             .split(/\s+/)
-            .filter((word) => word.length > 1);
+            .filter((word) => !stopwords.includes(word));
           return queryWords.some(
             (word) =>
               text.includes(word) || text.includes(word.replace(/s$/, ""))
           );
         });
 
-  const totalPages = Math.ceil(filteredCards.length / cardsPerPage);
-  const paginatedCards = filteredCards.slice(
-    (currentPage - 1) * cardsPerPage,
-    currentPage * cardsPerPage
-  );
-
   return (
     <div className="fullWidth py-6">
       <div className="containerWidth">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center flex-wrap mb-6 gap-4">
-          <div>
-            <h1 className="headingText">Admin Dashboard</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Showing {paginatedCards.length} of {filteredCards.length} cards
-            </p>
-          </div>
+          <h1 className="headingText">Admin Dashboard</h1>
           <div className="flex items-center flex-wrap gap-3">
             <FaThList
               className={`text-xl cursor-pointer ${
@@ -145,21 +168,25 @@ const AdminDashboard = () => {
               }`}
               onClick={() => setView("grid")}
             />
-            <SearchBar
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search cards..."
-            />
+            <div className="relative w-full sm:w-64">
+              <FaSearch className="absolute left-3 top-3 text-gray-400" />
+              <input
+                type="text"
+                className="formInput pl-10"
+                placeholder="Search cards..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
-        <DashboardLayout
-          left={
-            <LeftSidebarNav
-              navigate={navigate}
-              items={[
+        <div className="flex flex-col md:flex-row gap-6">
+          <aside className="w-full md:w-1/4">
+            <nav className="rounded-lg overflow-hidden border-gray-200">
+              {[
                 {
-                  label: "Account Settings",
+                  label: "Profile Settings",
                   icon: <FaCog className="text-indigo-600" />,
                   path: `/profile/${userId}`,
                 },
@@ -183,59 +210,63 @@ const AdminDashboard = () => {
                   icon: <FaBuilding className="text-orange-500" />,
                   path: "/add-outlet",
                 },
-                {
-                  label: "Add Employee",
-                  icon: <FaUserPlus className="text-teal-600" />,
-                  path: "/add-employee",
-                },
-              ]}
-            />
-          }
-          right={
-            <div>
-              <div
-                className={`${
-                  view === "grid"
-                    ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
-                    : view === "card"
-                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                    : "space-y-4"
-                }`}
-              >
-                {paginatedCards.map((card, index) => (
-                  <DashboardCard
-                    key={index}
-                    card={card}
-                    view={view}
-                    onClick={() => navigate(card.link)}
-                  />
-                ))}
-              </div>
+              ].map((item, index) => (
+                <button
+                  key={index}
+                  onClick={() => navigate(item.path)}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold shadow-sm text-gray-700 hover:shadow-lg hover:bg-green-50 rounded border-b"
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+          </aside>
 
-              {totalPages > 1 && (
-                <div className="flex justify-center mt-8 gap-4 flex-wrap">
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage((p) => p - 1)}
-                    className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+          <main className="w-full md:w-3/4">
+            <div
+              className={`${
+                view === "grid"
+                  ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
+                  : view === "card"
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                  : "space-y-4"
+              }`}
+            >
+              {filteredCards.map((card, index) => (
+                <div
+                  key={index}
+                  onClick={() => navigate(card.link)}
+                  className={`rounded cursor-pointer transition duration-200 hover:shadow-md ${
+                    card.bgColor
+                  } ${
+                    view === "card"
+                      ? "p-6 flex flex-col items-center justify-between text-center shadow"
+                      : view === "grid"
+                      ? "p-4"
+                      : "p-4 flex items-center justify-between"
+                  }`}
+                >
+                  <div
+                    className={
+                      view === "list"
+                        ? "flex items-center gap-4"
+                        : "flex items-center justify-between w-full"
+                    }
                   >
-                    Previous
-                  </button>
-                  <span className="text-gray-700 font-medium">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <button
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage((p) => p + 1)}
-                    className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-                  >
-                    Next
-                  </button>
+                    <div>
+                      <p className="subHeadingText mb-1">{card.title}</p>
+                      <p className="text-xl font-bold text-gray-800">
+                        {card.value}
+                      </p>
+                    </div>
+                    <div>{card.icon}</div>
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
-          }
-        />
+          </main>
+        </div>
       </div>
     </div>
   );
