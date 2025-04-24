@@ -43,9 +43,17 @@ export default function AddCategory() {
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6">
-        Add Main Category
-      </h2>
+      <div className="top_header flex justify-between items-center ">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          Add Main Category
+        </h2>
+        <a
+          href="/all-categories"
+          className="bg-gradient-to-r from-cyan-500 via-teal-500 to-indigo-500 text-white font-semibold py-1 px-2 rounded-lg shadow-lg hover:opacity-90 transition-opacity duration-300"
+        >
+          All Categories
+        </a>
+      </div>
 
       {message && <p className="text-green-500 text-center">{message}</p>}
 

@@ -27,12 +27,12 @@ import AllUsers from "../../pages/superadmin_pages/AllUsers";
 import SingleUser from "../../pages/superadmin_pages/SingleUser";
 import ForgotPassword from "../../pages/user_pages/ForgotPassword";
 import ResetPassword from "../../pages/user_pages/ResetPassword";
-// category pages. 
+// category pages.
 import AddCategory from "../../pages/category_pages/AddCategory";
 import AllCategories from "../../pages/category_pages/AllCategories";
 import SingleCategory from "../../pages/category_pages/SingleCategory";
 import CategoryAllProducts from "../../pages/category_pages/CategoryAllProducts";
-// subcategory pages. 
+// subcategory pages.
 import AddSubCategory from "../../pages/subcategory_pages/AddSubcategory";
 import AddVendor from "../../pages/vendor_pages/AddVendor";
 import AllVendors from "../../pages/vendor_pages/AllVendors";
@@ -257,8 +257,7 @@ const MainLayout = () => {
             }
           />
 
-
-{/* category routes.  */}
+          {/* category routes.  */}
           <Route
             path="/add-category"
             element={
@@ -270,7 +269,7 @@ const MainLayout = () => {
             }
           />
 
-<Route
+          <Route
             path="/add-sub-category"
             element={
               <PrivateRoute allowedRoles={["superadmin"]}>
@@ -280,8 +279,6 @@ const MainLayout = () => {
               </PrivateRoute>
             }
           />
-
-
 
           <Route
             path="/all-categories"
@@ -315,7 +312,7 @@ const MainLayout = () => {
             }
           />
 
-<Route
+          <Route
             path="/single-subcategory/:id"
             element={
               <PrivateRoute allowedRoles={["superadmin"]}>
@@ -425,8 +422,8 @@ const MainLayout = () => {
             }
           />
 
-           {/* product routes  */}
-           <Route
+          {/* product routes  */}
+          <Route
             path="/add-product"
             element={
               <PrivateRoute allowedRoles={["superadmin"]}>
@@ -437,8 +434,8 @@ const MainLayout = () => {
             }
           />
 
-<Route
-            path="/add-added-product"
+          <Route
+            path="/all-added-products"
             element={
               <PrivateRoute allowedRoles={["superadmin"]}>
                 <PageTitle title="Add Added Product">
@@ -448,7 +445,7 @@ const MainLayout = () => {
             }
           />
 
-<Route
+          <Route
             path="/single-added-product/:id"
             element={
               <PrivateRoute allowedRoles={["superadmin"]}>
@@ -458,7 +455,6 @@ const MainLayout = () => {
               </PrivateRoute>
             }
           />
-
 
           <Route
             path="/page-not-found"

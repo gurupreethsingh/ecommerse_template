@@ -1,24 +1,27 @@
+// ✅ Updated ProductModel.js
+
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
   product_name: { type: String, required: true },
-  slug: { type: String, unique: true }, // SEO-friendly URL
+  slug: { type: String, unique: true },
   product_image: { type: String, required: true },
   all_product_images: [{ type: String }],
   description: { type: String, required: true },
+  sku: { type: String, required: true, unique: true, trim: true }, // ✅ ADDED
+
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
-    required: true,
+    required: false, // ✅ Made optional
   },
   subcategory: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "SubCategory",
-    required: false, // change to true if needed
+    required: false,
   },
   brand: { type: String, required: true },
   barcode: { type: String },
-
   stock: { type: Number, required: true },
   warehouse_stock: [
     {
@@ -31,7 +34,7 @@ const productSchema = new mongoose.Schema({
   outlet: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Outlet",
-    required: false, // or true if needed
+    required: true, // ✅ Made required
   },
 
   dimensions: {
@@ -41,11 +44,9 @@ const productSchema = new mongoose.Schema({
   },
   color: { type: String },
   material: { type: String },
-
   ratings: { type: Number, default: 0 },
   avg_rating: { type: Number, default: 0 },
   total_reviews: { type: Number, default: 0 },
-
   tags: [{ type: String }],
   section_to_appear: {
     type: [String],
@@ -59,8 +60,8 @@ const productSchema = new mongoose.Schema({
       "most_viewed",
       "recommended",
       "home_banner",
-      "limited_time_offers"
-    ]
+      "limited_time_offers",
+    ],
   },
   featured: { type: Boolean, default: false },
   is_new_arrival: { type: Boolean, default: false },
@@ -72,7 +73,6 @@ const productSchema = new mongoose.Schema({
   delivery_time_estimate: { type: String },
   replacement_policy: { type: String },
   origin_country: { type: String },
-
   pricing_rules: [
     {
       type: { type: String, enum: ["flat", "percentage"] },
@@ -87,19 +87,16 @@ const productSchema = new mongoose.Schema({
     start_date: Date,
     end_date: Date,
   },
-
   vendor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Vendor",
-    required: true,
+    required: true, // ✅ Already correct
   },
-
   reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
   orders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }],
   purchases: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   returns: [{ type: mongoose.Schema.Types.ObjectId, ref: "Return" }],
   wishlist_users: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-
   questions: [
     {
       user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -109,7 +106,6 @@ const productSchema = new mongoose.Schema({
       answeredAt: Date,
     },
   ],
-
   related_products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   bundles: [
     {
@@ -122,37 +118,33 @@ const productSchema = new mongoose.Schema({
       bundle_price: Number,
     },
   ],
-
   vector_embedding: { type: [Number] },
   popularity_score: { type: Number, default: 0 },
-
   meta_title: { type: String },
   meta_description: { type: String },
-
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
   updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
-
   isDeleted: { type: Boolean, default: false },
   version: { type: Number, default: 1 },
   admin_notes: { type: String },
-
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
-// Auto update updatedAt on save
 productSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
-// Indexing for performance and search
-productSchema.index({ product_name: "text", tags: "text", meta_title: "text", meta_description: "text" });
+productSchema.index({
+  product_name: "text",
+  tags: "text",
+  meta_title: "text",
+  meta_description: "text",
+});
 productSchema.index({ category: 1 });
 productSchema.index({ vendor: 1 });
-productSchema.index({ SKU: 1 }, { unique: true });
 
-// Check if product is linked to user
 productSchema.methods.isLinkedToUser = function (userId) {
   const userInWishlist = this.wishlist_users.some(
     (user) => user.toString() === userId.toString()
@@ -167,5 +159,4 @@ productSchema.methods.isLinkedToUser = function (userId) {
 };
 
 const Product = mongoose.model("Product", productSchema);
-
 module.exports = Product;

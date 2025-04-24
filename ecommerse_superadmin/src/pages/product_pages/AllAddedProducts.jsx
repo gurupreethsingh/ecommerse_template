@@ -16,7 +16,9 @@ const AllAddedProducts = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get(`${globalBackendRoute}/api/all-added-products`);
+        const res = await axios.get(
+          `${globalBackendRoute}/api/all-added-products`
+        );
         setProducts(res.data);
         setTotalCount(res.data.length);
       } catch (error) {
@@ -27,18 +29,31 @@ const AllAddedProducts = () => {
     fetchProducts();
   }, []);
 
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return "https://via.placeholder.com/150";
-    const normalized = imagePath.replace(/\\/g, "/").split("/").pop();
-    return `${globalBackendRoute}/uploads/products/${normalized}`;
+  const getImageUrl = (img) => {
+    if (img) {
+      const normalized = img.replace(/\\/g, "/").split("/").pop();
+      return `${globalBackendRoute}/uploads/products/${normalized}`;
+    }
+    return "https://via.placeholder.com/150";
+  };
+
+  const handleImageError = (e) => {
+    if (!e.target.dataset.fallback) {
+      e.target.src = "https://via.placeholder.com/150";
+      e.target.dataset.fallback = "true";
+    }
   };
 
   const handleDeleteProduct = async (productId) => {
-    const confirm = window.confirm("Are you sure you want to delete this product?");
+    const confirm = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
     if (!confirm) return;
 
     try {
-      const res = await axios.delete(`${globalBackendRoute}/api/delete-product/${productId}`);
+      const res = await axios.delete(
+        `${globalBackendRoute}/api/delete-product/${productId}`
+      );
       if (res.status === 200) {
         setProducts((prev) => prev.filter((p) => p._id !== productId));
         toast.success("Product deleted successfully.");
@@ -51,12 +66,13 @@ const AllAddedProducts = () => {
 
   const filteredProducts = searchQuery.trim()
     ? products.filter((product) => {
-        const text = `${product.product_name} ${product.slug} ${product.brand}`.toLowerCase();
-        const words = searchQuery
+        const fullText =
+          `${product.product_name} ${product.sku} ${product.brand}`.toLowerCase();
+        const queryWords = searchQuery
           .toLowerCase()
           .split(/\s+/)
           .filter((word) => word && !stopwords.includes(word));
-        return words.some((word) => text.includes(word) || text.includes(word.replace(/s$/, "")));
+        return queryWords.some((word) => fullText.includes(word));
       })
     : products;
 
@@ -71,10 +87,29 @@ const AllAddedProducts = () => {
             </span>
           </h2>
           <div className="flex items-center flex-wrap gap-4">
-            <FaThList className={`text-xl cursor-pointer ${view === "list" ? "text-indigo-600" : "text-gray-600"}`} onClick={() => setView("list")} />
-            <FaThLarge className={`text-xl cursor-pointer ${view === "card" ? "text-indigo-600" : "text-gray-600"}`} onClick={() => setView("card")} />
-            <FaTh className={`text-xl cursor-pointer ${view === "grid" ? "text-indigo-600" : "text-gray-600"}`} onClick={() => setView("grid")} />
-            <SearchBar value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search products..." />
+            <FaThList
+              className={`text-xl cursor-pointer ${
+                view === "list" ? "text-indigo-600" : "text-gray-600"
+              }`}
+              onClick={() => setView("list")}
+            />
+            <FaThLarge
+              className={`text-xl cursor-pointer ${
+                view === "card" ? "text-indigo-600" : "text-gray-600"
+              }`}
+              onClick={() => setView("card")}
+            />
+            <FaTh
+              className={`text-xl cursor-pointer ${
+                view === "grid" ? "text-indigo-600" : "text-gray-600"
+              }`}
+              onClick={() => setView("grid")}
+            />
+            <SearchBar
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search products..."
+            />
           </div>
         </div>
 
@@ -84,15 +119,32 @@ const AllAddedProducts = () => {
           ) : view === "grid" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {filteredProducts.map((product) => (
-                <Link key={product._id} to={`/single-added-product/${product._id}`} className="relative flex flex-col items-start bg-white shadow rounded-lg overflow-hidden">
-                  <img src={getImageUrl(product.product_image)} alt={product.product_name} className="w-full h-48 object-cover" />
-                  <button onClick={(e) => { e.preventDefault(); handleDeleteProduct(product._id); }} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow hover:bg-red-600">
+                <Link
+                  key={product._id}
+                  to={`/single-added-product/${product._id}`}
+                  className="relative flex flex-col items-start bg-white shadow rounded-lg overflow-hidden"
+                >
+                  <img
+                    src={getImageUrl(product.product_image)}
+                    alt={product.product_name}
+                    onError={handleImageError}
+                    className="w-full h-48 object-cover"
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleDeleteProduct(product._id);
+                    }}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow hover:bg-red-600"
+                  >
                     <FaTrash />
                   </button>
                   <div className="p-3">
-                    <h3 className="subHeadingTextMobile">{product.product_name}</h3>
+                    <h3 className="subHeadingTextMobile">
+                      {product.product_name}
+                    </h3>
+                    <p className="paragraphTextMobile">{product.sku}</p>
                     <p className="paragraphTextMobile">{product.brand}</p>
-                    <p className="paragraphTextMobile">Stock: {product.stock}</p>
                   </div>
                 </Link>
               ))}
@@ -100,15 +152,30 @@ const AllAddedProducts = () => {
           ) : view === "card" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProducts.map((product) => (
-                <Link key={product._id} to={`/single-added-product/${product._id}`} className="bg-white rounded-lg shadow relative">
-                  <img src={getImageUrl(product.product_image)} alt={product.product_name} className="w-full h-96 object-cover rounded-t-lg" />
-                  <button onClick={(e) => { e.preventDefault(); handleDeleteProduct(product._id); }} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow hover:bg-red-600">
+                <Link
+                  key={product._id}
+                  to={`/single-added-product/${product._id}`}
+                  className="bg-white rounded-lg shadow relative"
+                >
+                  <img
+                    src={getImageUrl(product.product_image)}
+                    alt={product.product_name}
+                    onError={handleImageError}
+                    className="w-full h-96 object-cover rounded-t-lg"
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleDeleteProduct(product._id);
+                    }}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow hover:bg-red-600"
+                  >
                     <FaTrash />
                   </button>
                   <div className="p-4">
                     <h3 className="subHeadingText">{product.product_name}</h3>
-                    <p className="paragraphText">{product.slug}</p>
-                    <p className="paragraphText">Stock: {product.stock}</p>
+                    <p className="paragraphText">{product.sku}</p>
+                    <p className="paragraphText">{product.brand}</p>
                   </div>
                 </Link>
               ))}
@@ -116,15 +183,32 @@ const AllAddedProducts = () => {
           ) : (
             <div className="space-y-4">
               {filteredProducts.map((product) => (
-                <Link key={product._id} to={`/single-added-product/${product._id}`} className="flex items-center space-x-4 bg-white rounded-lg shadow p-3 relative">
-                  <img src={getImageUrl(product.product_image)} alt={product.product_name} className="w-20 h-20 object-cover rounded-lg" />
-                  <button onClick={(e) => { e.preventDefault(); handleDeleteProduct(product._id); }} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow hover:bg-red-600">
+                <Link
+                  key={product._id}
+                  to={`/single-added-product/${product._id}`}
+                  className="flex items-center space-x-4 bg-white rounded-lg shadow p-3 relative"
+                >
+                  <img
+                    src={getImageUrl(product.product_image)}
+                    alt={product.product_name}
+                    onError={handleImageError}
+                    className="w-20 h-20 object-cover rounded-lg"
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleDeleteProduct(product._id);
+                    }}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow hover:bg-red-600"
+                  >
                     <FaTrash />
                   </button>
                   <div>
-                    <h3 className="subHeadingTextMobile">{product.product_name}</h3>
+                    <h3 className="subHeadingTextMobile">
+                      {product.product_name}
+                    </h3>
+                    <p className="paragraphTextMobile">{product.sku}</p>
                     <p className="paragraphTextMobile">{product.brand}</p>
-                    <p className="paragraphTextMobile">Stock: {product.stock}</p>
                   </div>
                 </Link>
               ))}
