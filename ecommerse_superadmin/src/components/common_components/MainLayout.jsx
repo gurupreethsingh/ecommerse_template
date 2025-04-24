@@ -41,6 +41,7 @@ import AddOutlet from "../../pages/outlet_pages/AddOutlet";
 import SingleOutlet from "../../pages/outlet_pages/SingleOutlet";
 import AllOutlets from "../../pages/outlet_pages/AllOutlets";
 import AllSubCategories from "../../pages/subcategory_pages/AllSubCategories";
+import SingleSubCategory from "../../pages/subcategory_pages/SingleSubCategory";
 
 const MainLayout = () => {
   return (
@@ -306,6 +307,17 @@ const MainLayout = () => {
               <PrivateRoute allowedRoles={["superadmin"]}>
                 <PageTitle title="Single Category">
                   <SingleCategory />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+<Route
+            path="/single-subcategory/:id"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="Single SubCategory">
+                  <SingleSubCategory />
                 </PageTitle>
               </PrivateRoute>
             }
