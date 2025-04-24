@@ -9,15 +9,14 @@ const path = require("path");
 const fs = require("fs");
 const bcrypt = require("bcrypt");
 
-const userRoutes = require(".//routes/UserRoutes");
+const userRoutes = require("./routes/UserRoutes");
 const activityRoutes = require("./routes/ActivityRoutes");
-
-
 const entityCountRoutes = require("./routes/EntityCountRoutes");
 const categoryRoutes = require("./routes/CategoryRoutes");
 const subCategoryRoutes = require("./routes/SubCategoryRoutes")
 const outletRoutes = require("./routes/OutletRoutes");
 const vendorRoutes = require("./routes/VendorRoutes");
+const productRoutes = require("./routes/ProductRoutes");
 
 // 2. give a name to your api backend. app = express()
 dotenv.config();
@@ -43,6 +42,7 @@ app.use("/api", outletRoutes);
 app.use("/api", vendorRoutes);
 app.use("/api", entityCountRoutes);
 app.use("/api" , subCategoryRoutes);
+app.use("/api" , productRoutes);
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");

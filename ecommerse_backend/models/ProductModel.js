@@ -11,6 +11,11 @@ const productSchema = new mongoose.Schema({
     ref: "Category",
     required: true,
   },
+  subcategory: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "SubCategory",
+    required: false, // change to true if needed
+  },
   brand: { type: String, required: true },
   barcode: { type: String },
 
@@ -23,21 +28,11 @@ const productSchema = new mongoose.Schema({
   ],
   total_products_sold: { type: Number, default: 0 },
 
-  outlet: [
-    {
-      outlet: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Outlet",
-      },
-      products: [
-        {
-          volume: { type: String, required: true },
-          selling_price: { type: Number, required: true },
-          display_price: { type: Number, required: true },
-        },
-      ],
-    },
-  ],
+  outlet: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Outlet",
+    required: false, // or true if needed
+  },
 
   dimensions: {
     length: { type: Number },

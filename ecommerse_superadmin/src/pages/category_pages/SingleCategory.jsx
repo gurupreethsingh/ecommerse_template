@@ -81,12 +81,15 @@ export default function SingleCategory() {
           animate={{ scale: 1, opacity: 1 }}
           className="w-auto h-full sm:w-48 sm:h-48"
         >
-          <img
-            src={getImageUrl(categoryData.category_image)}
-            alt={categoryData.category_name}
-            className="w-full h-full object-cover rounded-xl border"
-            onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
-          />
+         <img
+  src={
+    categoryData.category_image
+      ? getImageUrl(categoryData.category_image)
+      : "https://via.placeholder.com/150"
+  }
+  alt={categoryData.category_name || "Category"}
+  className="w-full h-full object-cover rounded-xl border"
+/>
         </motion.div>
 
         {/* Category Details */}

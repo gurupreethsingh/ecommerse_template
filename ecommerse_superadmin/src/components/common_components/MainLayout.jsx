@@ -42,6 +42,9 @@ import SingleOutlet from "../../pages/outlet_pages/SingleOutlet";
 import AllOutlets from "../../pages/outlet_pages/AllOutlets";
 import AllSubCategories from "../../pages/subcategory_pages/AllSubCategories";
 import SingleSubCategory from "../../pages/subcategory_pages/SingleSubCategory";
+import AddProduct from "../../pages/product_pages/AddProduct";
+import AllAddedProducts from "../../pages/product_pages/AllAddedProducts";
+import SingleAddedProduct from "../../pages/product_pages/SingleAddedProduct";
 
 const MainLayout = () => {
   return (
@@ -421,6 +424,41 @@ const MainLayout = () => {
               </PrivateRoute>
             }
           />
+
+           {/* product routes  */}
+           <Route
+            path="/add-product"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="Add Product">
+                  <AddProduct />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+<Route
+            path="/add-added-product"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="Add Added Product">
+                  <AllAddedProducts />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
+<Route
+            path="/single-added-product/:id"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <PageTitle title="Single Added Product">
+                  <SingleAddedProduct />
+                </PageTitle>
+              </PrivateRoute>
+            }
+          />
+
 
           <Route
             path="/page-not-found"

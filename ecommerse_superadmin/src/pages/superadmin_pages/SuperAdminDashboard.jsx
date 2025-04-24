@@ -156,8 +156,13 @@ const SuperadminDashboard = () => {
                 },
                 {
                   label: "Add Category",
-                  icon: <FaPlus className="text-orange-500" />,
+                  icon: <FaPlus className="text-orange-400" />,
                   path: "/add-category",
+                },
+                {
+                  label: "Add Sub Category",
+                  icon: <FaPlus className="text-orange-600" />,
+                  path: "/add-sub-category",
                 },
                 {
                   label: "Add Product",
