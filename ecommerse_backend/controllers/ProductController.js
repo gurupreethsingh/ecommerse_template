@@ -43,6 +43,8 @@ exports.createProduct = async (req, res) => {
       slug,
       description,
       sku,
+      selling_price,
+      display_price,
       category,
       subcategory,
       brand,
@@ -101,6 +103,8 @@ exports.createProduct = async (req, res) => {
       slug,
       description,
       sku,
+      selling_price,
+      display_price,
       product_image: mainImage,
       all_product_images: galleryImages,
       category,
@@ -197,9 +201,9 @@ exports.updateProductById = async (req, res) => {
     const {
       product_name,
       slug,
-      product_image,
-      all_product_images,
       description,
+      selling_price,
+      display_price,
       category,
       subcategory,
       brand,
@@ -246,65 +250,118 @@ exports.updateProductById = async (req, res) => {
       admin_notes,
     } = req.body;
 
+    const cleanArray = (arr) => {
+      if (typeof arr === "string") {
+        try {
+          const parsed = JSON.parse(arr);
+          if (Array.isArray(parsed)) return parsed;
+          return [];
+        } catch {
+          return [];
+        }
+      }
+      if (!Array.isArray(arr)) return [];
+      return arr;
+    };
+
+    // 🛡️ Fix pricing_rules
+    let safePricingRules = [];
+    if (pricing_rules) {
+      if (typeof pricing_rules === "string") {
+        try {
+          const parsed = JSON.parse(pricing_rules);
+          if (Array.isArray(parsed)) {
+            safePricingRules = parsed;
+          }
+        } catch (err) {
+          console.error("Invalid pricing_rules format:", err);
+          safePricingRules = [];
+        }
+      } else if (Array.isArray(pricing_rules)) {
+        safePricingRules = pricing_rules;
+      }
+    }
+
+    const updatedFields = {
+      product_name,
+      slug,
+      description,
+      selling_price: selling_price ? Number(selling_price) : 0,
+      display_price: display_price ? Number(display_price) : 0,
+      category,
+      subcategory,
+      brand,
+      barcode,
+      stock: stock ? Number(stock) : 0,
+      warehouse_stock: cleanArray(warehouse_stock),
+      total_products_sold: total_products_sold
+        ? Number(total_products_sold)
+        : 0,
+      outlet,
+      dimensions,
+      color,
+      material,
+      ratings: ratings ? Number(ratings) : 0,
+      avg_rating: avg_rating ? Number(avg_rating) : 0,
+      total_reviews: total_reviews ? Number(total_reviews) : 0,
+      tags: cleanArray(tags),
+      section_to_appear: cleanArray(section_to_appear),
+      featured: featured === "true" || featured === true,
+      is_new_arrival: is_new_arrival === "true" || is_new_arrival === true,
+      is_trending: is_trending === "true" || is_trending === true,
+      availability_status:
+        availability_status === "true" || availability_status === true,
+      discount: discount ? Number(discount) : 0,
+      min_purchase_qty: min_purchase_qty ? Number(min_purchase_qty) : 1,
+      max_purchase_qty: max_purchase_qty ? Number(max_purchase_qty) : 100,
+      delivery_time_estimate,
+      replacement_policy,
+      origin_country,
+      pricing_rules: safePricingRules,
+      campaign,
+      vendor,
+      reviews: cleanArray(reviews),
+      orders: cleanArray(orders),
+      purchases: cleanArray(purchases),
+      returns: cleanArray(returns),
+      wishlist_users: cleanArray(wishlist_users),
+      questions: cleanArray(questions),
+      related_products: cleanArray(related_products),
+      bundles: cleanArray(bundles),
+      vector_embedding: cleanArray(vector_embedding),
+      popularity_score: popularity_score ? Number(popularity_score) : 0,
+      meta_title,
+      meta_description,
+      updatedBy,
+      version: version ? Number(version) : 1,
+      admin_notes,
+      updatedAt: Date.now(),
+    };
+
+    if (req.files) {
+      if (req.files["product_image"] && req.files["product_image"][0]) {
+        updatedFields.product_image = req.files[
+          "product_image"
+        ][0].path.replace(/\\/g, "/");
+      }
+
+      if (req.files["all_product_images"]) {
+        updatedFields.all_product_images = req.files["all_product_images"].map(
+          (file) => file.path.replace(/\\/g, "/")
+        );
+      }
+    }
+
     const updated = await Product.findByIdAndUpdate(
       req.params.id,
-      {
-        product_name,
-        slug,
-        product_image,
-        all_product_images,
-        description,
-        category,
-        subcategory,
-        brand,
-        barcode,
-        stock,
-        warehouse_stock,
-        total_products_sold,
-        outlet,
-        dimensions,
-        color,
-        material,
-        ratings,
-        avg_rating,
-        total_reviews,
-        tags,
-        section_to_appear,
-        featured,
-        is_new_arrival,
-        is_trending,
-        availability_status,
-        discount,
-        min_purchase_qty,
-        max_purchase_qty,
-        delivery_time_estimate,
-        replacement_policy,
-        origin_country,
-        pricing_rules,
-        campaign,
-        vendor,
-        reviews,
-        orders,
-        purchases,
-        returns,
-        wishlist_users,
-        questions,
-        related_products,
-        bundles,
-        vector_embedding,
-        popularity_score,
-        meta_title,
-        meta_description,
-        updatedBy,
-        version,
-        admin_notes,
-        updatedAt: Date.now(),
-      },
+      updatedFields,
       { new: true }
     );
 
-    if (!updated)
+    if (!updated) {
       return res.status(404).json({ message: "Product not found." });
+    }
+
     res.status(200).json(updated);
   } catch (error) {
     console.error("Update Product Error:", error);
@@ -440,5 +497,34 @@ exports.getProductsSorted = async (req, res) => {
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: "Failed to sort products." });
+  }
+};
+
+// 🔥 Add this function properly
+exports.searchProducts = async (req, res) => {
+  try {
+    const { query } = req.query;
+    if (!query) {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+
+    const products = await Product.find({
+      isDeleted: false,
+      $or: [
+        { product_name: { $regex: query, $options: "i" } },
+        { description: { $regex: query, $options: "i" } },
+        { brand: { $regex: query, $options: "i" } },
+        { tags: { $regex: query, $options: "i" } },
+        { color: { $regex: query, $options: "i" } },
+        { material: { $regex: query, $options: "i" } },
+        { meta_title: { $regex: query, $options: "i" } },
+        { meta_description: { $regex: query, $options: "i" } },
+      ],
+    }).populate("category subcategory vendor");
+
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Search Products Error:", error.message);
+    res.status(500).json({ message: "Failed to search products" });
   }
 };

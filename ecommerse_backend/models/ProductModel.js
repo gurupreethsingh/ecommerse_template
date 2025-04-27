@@ -9,6 +9,8 @@ const productSchema = new mongoose.Schema({
   all_product_images: [{ type: String }],
   description: { type: String, required: true },
   sku: { type: String, required: true, unique: true, trim: true }, // ✅ ADDED
+  display_price: { type: Number }, // ✅ base price
+  selling_price: { type: Number, required: true }, // ✅ after discount if needed
 
   category: {
     type: mongoose.Schema.Types.ObjectId,

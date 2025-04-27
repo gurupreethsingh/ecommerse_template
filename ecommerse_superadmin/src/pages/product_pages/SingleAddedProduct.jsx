@@ -1,26 +1,21 @@
+// pages/product_pages/SingleAddedProduct.jsx
 import React, { useEffect, useState } from "react";
 import {
-  FaImage,
   FaUser,
-  FaCalendarAlt,
   FaTags,
   FaWarehouse,
   FaStore,
-  FaCubes,
   FaCube,
   FaPalette,
-  FaBox,
-  FaCheck,
-  FaGlobe,
-  FaChartLine,
   FaClipboardList,
+  FaStar,
+  FaChartLine,
+  FaPercentage,
   FaListOl,
-  FaBalanceScale,
   FaClock,
   FaFlag,
-  FaPercentage,
-  FaStar,
-  FaEye,
+  FaGlobe,
+  FaCheck,
 } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { motion } from "framer-motion";
@@ -51,50 +46,6 @@ export default function SingleAddedProduct() {
         delete dataCopy.outlet;
         delete dataCopy.category;
         delete dataCopy.subcategory;
-
-        // Remove array-based fields with ObjectId refs if empty or invalid
-        [
-          "reviews",
-          "orders",
-          "purchases",
-          "returns",
-          "wishlist_users",
-          "related_products",
-        ].forEach((arrField) => {
-          if (
-            Array.isArray(dataCopy[arrField]) &&
-            dataCopy[arrField].length === 0
-          ) {
-            delete dataCopy[arrField];
-          }
-        });
-
-        [
-          "avg_rating",
-          "total_reviews",
-          "total_products_sold",
-          "discount",
-          "min_purchase_qty",
-          "max_purchase_qty",
-          "version",
-          "stock",
-        ].forEach((field) => {
-          if (dataCopy[field] !== undefined && dataCopy[field] !== null) {
-            dataCopy[field] = String(dataCopy[field]);
-          }
-        });
-
-        [
-          "featured",
-          "is_new_arrival",
-          "is_trending",
-          "availability_status",
-        ].forEach((field) => {
-          if (dataCopy[field] !== undefined && dataCopy[field] !== null) {
-            dataCopy[field] = Boolean(dataCopy[field]).toString();
-          }
-        });
-
         setUpdatedFields(dataCopy);
       } catch (error) {
         console.error("Error fetching product data:", error);
@@ -104,47 +55,32 @@ export default function SingleAddedProduct() {
   }, [id]);
 
   const handleUpdate = async () => {
-    const formData = new FormData();
-    Object.entries(updatedFields).forEach(([key, val]) => {
-      if (val !== undefined && val !== null) {
-        if (
-          [
-            "avg_rating",
-            "total_reviews",
-            "total_products_sold",
-            "discount",
-            "min_purchase_qty",
-            "max_purchase_qty",
-            "version",
-            "stock",
-          ].includes(key)
-        ) {
-          const number = parseFloat(val);
-          if (isNaN(number)) return alert(`${key} must be a number.`);
-          formData.append(key, number);
-        } else if (
-          [
-            "featured",
-            "is_new_arrival",
-            "is_trending",
-            "availability_status",
-          ].includes(key)
-        ) {
-          const bool = val === "true";
-          formData.append(key, bool);
-        } else {
-          formData.append(key, val);
-        }
-      }
-    });
-
-    if (newMainImage) formData.append("product_image", newMainImage);
-    if (newGalleryImages.length)
-      newGalleryImages.forEach((img) =>
-        formData.append("all_product_images", img)
-      );
-
     try {
+      const formData = new FormData();
+
+      // Append all updated fields
+      Object.entries(updatedFields).forEach(([key, val]) => {
+        if (val !== undefined && val !== null) {
+          if (Array.isArray(val)) {
+            formData.append(key, JSON.stringify(val));
+          } else {
+            formData.append(key, val);
+          }
+        }
+      });
+
+      // Handle new main image
+      if (newMainImage) {
+        formData.append("product_image", newMainImage);
+      }
+
+      // Handle new gallery images
+      if (newGalleryImages.length > 0) {
+        newGalleryImages.forEach((file) => {
+          formData.append("all_product_images", file);
+        });
+      }
+
       await axios.put(
         `${globalBackendRoute}/api/update-product/${id}`,
         formData,
@@ -152,6 +88,7 @@ export default function SingleAddedProduct() {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
+
       alert("Product updated successfully!");
       window.location.reload();
     } catch (error) {
@@ -168,47 +105,17 @@ export default function SingleAddedProduct() {
   const safe = (val) =>
     val === null || val === undefined || val === "" ? "NA" : val;
 
-  const renderEditableField = (key, value) => (
-    <ModernTextInput
-      value={updatedFields[key] || ""}
-      onChange={(e) =>
-        setUpdatedFields((prev) => ({ ...prev, [key]: e.target.value }))
-      }
-    />
-  );
-
   if (!productData) return <div className="text-center py-8">Loading...</div>;
 
   const allFields = [
     { icon: <FaUser />, label: "Product Name", key: "product_name" },
     { icon: <FaTags />, label: "SKU", key: "sku" },
     { icon: <FaWarehouse />, label: "Stock", key: "stock" },
-    {
-      icon: <FaStore />,
-      label: "Vendor",
-      value:
-        productData.vendor?.vendor_name || productData.vendor?.name || "NA",
-    },
-    {
-      icon: <FaStore />,
-      label: "Outlet",
-      value:
-        productData.outlet?.outlet_name || productData.outlet?.name || "NA",
-    },
-    {
-      icon: <FaBox />,
-      label: "Category",
-      value: productData.category?.category_name || "NA",
-    },
-    {
-      icon: <FaBox />,
-      label: "Subcategory",
-      value: productData.subcategory?.subcategory_name || "NA",
-    },
-    { icon: <FaTags />, label: "Brand", key: "brand" },
-    { icon: <FaTags />, label: "Barcode", key: "barcode" },
+    { icon: <FaStore />, label: "Brand", key: "brand" },
     { icon: <FaPalette />, label: "Color", key: "color" },
     { icon: <FaCube />, label: "Material", key: "material" },
+    { icon: <FaClipboardList />, label: "Display Price", key: "display_price" },
+    { icon: <FaClipboardList />, label: "Selling Price", key: "selling_price" },
     { icon: <FaStar />, label: "Avg Rating", key: "avg_rating" },
     { icon: <FaClipboardList />, label: "Total Reviews", key: "total_reviews" },
     { icon: <FaChartLine />, label: "Total Sold", key: "total_products_sold" },
@@ -223,11 +130,6 @@ export default function SingleAddedProduct() {
     },
     { icon: <FaFlag />, label: "Origin Country", key: "origin_country" },
     { icon: <FaGlobe />, label: "Availability", key: "availability_status" },
-    {
-      icon: <FaClipboardList />,
-      label: "Replacement Policy",
-      key: "replacement_policy",
-    },
     { icon: <FaCheck />, label: "Featured", key: "featured" },
     { icon: <FaCheck />, label: "New Arrival", key: "is_new_arrival" },
     { icon: <FaCheck />, label: "Trending", key: "is_trending" },
@@ -254,38 +156,49 @@ export default function SingleAddedProduct() {
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="w-auto h-full sm:w-48 sm:h-48"
+          className="w-full sm:w-1/3 space-y-4"
         >
           <img
             src={getImageUrl(productData.product_image)}
             alt={productData.product_name || "Product"}
-            className="w-full h-full object-cover rounded-xl border"
+            className="w-full h-48 object-cover rounded-xl border"
           />
-          {editMode && <ModernFileInput onFileSelect={setNewMainImage} />}
 
           {editMode && (
-            <ModernFileInput
-              multiple
-              label="Gallery Images"
-              onFileSelect={(files) => setNewGalleryImages(files)}
-            />
+            <>
+              {/* Main Product Image Upload */}
+              <ModernFileInput
+                label="Update Main Product Image"
+                multiple={false}
+                onFileSelect={(file) => setNewMainImage(file)}
+              />
+
+              {/* Gallery Images Upload */}
+              <ModernFileInput
+                label="Update Gallery Images (Max 10)"
+                multiple={true}
+                maxFiles={10}
+                onFileSelect={(files) => setNewGalleryImages(files)}
+              />
+            </>
           )}
 
+          {/* Existing Gallery Images Preview */}
           {productData.all_product_images?.length > 0 && (
-            <div className="grid grid-cols-3 gap-2 mt-2">
+            <div className="grid grid-cols-3 gap-2 mt-4">
               {productData.all_product_images.map((img, i) => (
                 <img
                   key={i}
                   src={getImageUrl(img)}
                   alt={`Gallery ${i}`}
-                  className="w-20 h-20 object-cover rounded border"
+                  className="w-full h-20 object-cover rounded-lg border"
                 />
               ))}
             </div>
           )}
         </motion.div>
 
-        <div className="w-full">
+        <div className="w-full sm:w-2/3">
           <motion.h3
             className="subHeadingTextMobile lg:subHeadingText mb-4"
             initial={{ x: -30, opacity: 0 }}
@@ -301,25 +214,35 @@ export default function SingleAddedProduct() {
                 icon={field.icon}
                 label={field.label}
                 value={
-                  editMode && field.key
-                    ? renderEditableField(field.key, field.value)
-                    : safe(field.value ?? updatedFields[field.key])
+                  editMode && field.key ? (
+                    <ModernTextInput
+                      value={updatedFields[field.key] || ""}
+                      onChange={(e) =>
+                        setUpdatedFields((prev) => ({
+                          ...prev,
+                          [field.key]: e.target.value,
+                        }))
+                      }
+                    />
+                  ) : (
+                    safe(updatedFields[field.key])
+                  )
                 }
               />
             ))}
           </div>
 
-          <div className="mt-6 text-center flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => (editMode ? handleUpdate() : setEditMode(true))}
-              className="primaryBtn w-fit px-4 flex items-center gap-2 rounded-full"
+              className="primaryBtn w-fit px-6 py-2 rounded-full flex items-center gap-2"
             >
-              <MdEdit /> {editMode ? "Save" : "Update"}
+              <MdEdit /> {editMode ? "Save Changes" : "Edit Product"}
             </button>
 
             <Link
               to="/all-added-products"
-              className="secondaryBtn w-fit px-4 rounded-full"
+              className="secondaryBtn w-fit px-6 py-2 rounded-full"
             >
               Back to All Products
             </Link>

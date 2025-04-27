@@ -27,6 +27,11 @@ import ContactUs from "../../pages/contact_pages/ContactUs";
 
 // subscription page.
 import Subscriptions from "../../pages/subscription_pages/Subscriptions";
+import SearchProducts from "../../pages/product_pages/SearchProducts";
+
+// shop page.
+import Shop from "../../pages/shop_pages/Shop";
+import SingleProduct from "../../pages/shop_pages/SingleProduct";
 
 const MainLayout = () => {
   return (
@@ -37,51 +42,41 @@ const MainLayout = () => {
           <Route
             path="/"
             element={
-
-                <PageTitle title="Home">
-                  <Homepage />
-                </PageTitle>
-
+              <PageTitle title="Home">
+                <Homepage />
+              </PageTitle>
             }
           />
           <Route
             path="/home"
             element={
-
-                <PageTitle title="Home">
-                  <Homepage />
-                </PageTitle>
-
+              <PageTitle title="Home">
+                <Homepage />
+              </PageTitle>
             }
           />
           <Route
             path="/homepage"
             element={
-
-                <PageTitle title="Home">
-                  <Homepage />
-                </PageTitle>
-
+              <PageTitle title="Home">
+                <Homepage />
+              </PageTitle>
             }
           />
           <Route
             path="/contact-us"
             element={
-  
-                <PageTitle title="Contact Us">
-                  <ContactUs />
-                </PageTitle>
-
+              <PageTitle title="Contact Us">
+                <ContactUs />
+              </PageTitle>
             }
           />
           <Route
             path="/about-us"
             element={
-
-                <PageTitle title="About Us">
-                  <AboutUs />
-                </PageTitle>
-
+              <PageTitle title="About Us">
+                <AboutUs />
+              </PageTitle>
             }
           />
           <Route
@@ -120,7 +115,9 @@ const MainLayout = () => {
 
           <Route path="/reset-password" element={<ResetPassword />} />
 
-         
+          <Route path="/shop" element={<Shop />} />
+
+          <Route path="/single-product/:id" element={<SingleProduct />} />
 
           <Route
             path="/profile/:id"
@@ -144,8 +141,6 @@ const MainLayout = () => {
             }
           />
 
-         
-
           <Route
             path="/all-blogs"
             element={
@@ -163,7 +158,17 @@ const MainLayout = () => {
               </PageTitle>
             }
           />
-          
+
+          {/* product pages  */}
+          <Route
+            path="/search-products"
+            element={
+              <PageTitle title="Search Products">
+                <SearchProducts />
+              </PageTitle>
+            }
+          />
+
           <Route
             path="/page-not-found"
             element={

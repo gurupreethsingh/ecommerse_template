@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
-import { FaSignInAlt } from "react-icons/fa";
+import { FaSignInAlt, FaEye, FaEyeSlash } from "react-icons/fa"; // ✅ Added Eye icons
 import { AuthContext } from "../../components/auth_components/AuthManager";
 import globalBackendRoute from "../../config/Config";
 
@@ -8,6 +8,7 @@ const Login = () => {
   const { login } = useContext(AuthContext);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // ✅ Added state
   const { email, password } = formData;
 
   const handleChange = (e) =>
@@ -46,16 +47,27 @@ const Login = () => {
     }
 
     try {
-      const response = await axios.post(
-        `${globalBackendRoute}/api/login`,
-        formData
-      );
+      const response = await axios.post(`${globalBackendRoute}/api/login`, {
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+      });
+      console.log("Login Success:", response.data); // ✅ Successful login log
       login(response.data.token);
       alert("Login successful, redirecting...");
       setError("");
-    } catch {
-      setError("Login failed. Try again.");
+    } catch (err) {
+      console.error("Login Failed:", err); // ✅ Log the full error
+      const backendMessage = err.response?.data?.message;
+      if (backendMessage) {
+        setError(backendMessage); // ✅ Show backend message like "Invalid credentials"
+      } else {
+        setError("Login failed. Try again.");
+      }
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
   };
 
   return (
@@ -85,6 +97,7 @@ const Login = () => {
               id="email"
               name="email"
               type="email"
+              autoComplete="email"
               value={formData.email}
               onChange={handleChange}
               required
@@ -93,7 +106,7 @@ const Login = () => {
             />
           </div>
 
-          {/* Password Input with Forgot Link */}
+          {/* Password Input with Eye Toggle */}
           <div>
             <div className="flex items-center justify-between">
               <label
@@ -109,16 +122,27 @@ const Login = () => {
                 Forgot password?
               </a>
             </div>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="formInput mt-2"
-              placeholder="Enter your password"
-            />
+
+            <div className="relative mt-2">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"} // 👁️ Toggle type
+                autoComplete="current-password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="formInput pr-10" // right padding for icon
+                placeholder="Enter your password"
+              />
+              {/* Eye Icon */}
+              <span
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
           </div>
 
           <button type="submit" className="primaryBtn w-full">

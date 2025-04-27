@@ -11,6 +11,8 @@ export default function AddProduct() {
     slug: "",
     description: "",
     sku: "",
+    selling_price: "",
+    display_price: "",
     brand: "",
     barcode: "",
     stock: 0,
@@ -95,6 +97,11 @@ export default function AddProduct() {
       return;
     }
 
+    if (!productData.selling_price || isNaN(productData.selling_price)) {
+      setMessage("Selling price is required and must be a valid number.");
+      return;
+    }
+
     if (!productData.vendor || !productData.outlet) {
       setMessage("Vendor and Outlet are required.");
       return;
@@ -169,6 +176,24 @@ export default function AddProduct() {
           name="slug"
           placeholder="example-product-slug"
           value={productData.slug}
+          onChange={handleChange}
+        />
+
+        <ModernTextInput
+          label="Selling Price *"
+          name="selling_price"
+          type="number"
+          placeholder="Enter selling price"
+          value={productData.selling_price}
+          onChange={handleChange}
+        />
+
+        <ModernTextInput
+          label="Display Price (Optional)"
+          name="display_price"
+          type="number"
+          placeholder="Enter original display price (optional)"
+          value={productData.display_price}
           onChange={handleChange}
         />
         <ModernTextInput

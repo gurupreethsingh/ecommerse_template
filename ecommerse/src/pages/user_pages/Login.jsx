@@ -85,6 +85,7 @@ const Login = () => {
               id="email"
               name="email"
               type="email"
+              autoComplete="email" // ✅ Added
               value={formData.email}
               onChange={handleChange}
               required
@@ -93,7 +94,7 @@ const Login = () => {
             />
           </div>
 
-          {/* Password Input with Forgot Link */}
+          {/* Password Input */}
           <div>
             <div className="flex items-center justify-between">
               <label
@@ -113,6 +114,7 @@ const Login = () => {
               id="password"
               name="password"
               type="password"
+              autoComplete="current-password" // ✅ Added
               value={formData.password}
               onChange={handleChange}
               required

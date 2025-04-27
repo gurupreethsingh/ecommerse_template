@@ -49,8 +49,15 @@ const addCategory = async (req, res) => {
 // Get all categories
 const getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
-    res.status(200).json(categories);
+    const categories = await Category.find({}, "category_name");
+
+    // Modify structure to send { _id, name }
+    const formattedCategories = categories.map((cat) => ({
+      _id: cat._id,
+      name: cat.category_name, // Map category_name to name
+    }));
+
+    res.status(200).json(formattedCategories);
   } catch (error) {
     console.error("Error fetching categories:", error);
     res.status(500).json({ message: "Error fetching categories" });
