@@ -94,7 +94,6 @@ const SearchProducts = () => {
   const handleAddToCart = (product) => {
     if (product.availability_status) {
       addToCart(product);
-      toast.success("Added to cart!", { autoClose: 800 });
     } else {
       toast.error("Cannot add. Product is Out of Stock!", { autoClose: 1200 });
     }

@@ -33,12 +33,14 @@ import SearchProducts from "../../pages/product_pages/SearchProducts";
 import Shop from "../../pages/shop_pages/Shop";
 import SingleProduct from "../../pages/shop_pages/SingleProduct";
 
-// cart pages. 
+// cart pages.
 import CartPage from "../../pages/cart_pages/CartPage";
+import CheckoutPage from "../../pages/cart_pages/CheckoutPage";
+import MyOrders from "../../pages/orders_page/MyOrders";
+import ThankYou from "../../pages/orders_page/ThankYou";
 
 const MainLayout = () => {
   return (
-
     <div className="min-h-screen text-gray-900">
       <Header />
       <main className="flex-grow containerWidth py-6">
@@ -173,12 +175,39 @@ const MainLayout = () => {
             }
           />
 
-                    {/* cart pages  */}
-                    <Route
+          {/* cart pages  */}
+          <Route
             path="/cart"
             element={
               <PageTitle title="Cart Page">
                 <CartPage />
+              </PageTitle>
+            }
+          />
+
+          <Route
+            path="/checkout"
+            element={
+              <PageTitle title="Checkout Page">
+                <CheckoutPage />
+              </PageTitle>
+            }
+          />
+
+          <Route
+            path="/my-orders"
+            element={
+              <PageTitle title="Myorders Page">
+                <MyOrders />
+              </PageTitle>
+            }
+          />
+
+          <Route
+            path="/thank-you"
+            element={
+              <PageTitle title="ThankYou Page">
+                <ThankYou />
               </PageTitle>
             }
           />
@@ -203,7 +232,6 @@ const MainLayout = () => {
       </main>
       <Footer />
     </div>
-
   );
 };
 
