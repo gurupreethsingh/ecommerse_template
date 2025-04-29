@@ -26,7 +26,9 @@ const Shop = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${globalBackendRoute}/api/all-added-products`);
+        const res = await axios.get(
+          `${globalBackendRoute}/api/all-added-products`
+        );
         const products = res.data || [];
         setAllProducts(products);
         setFilteredProducts(products);
@@ -53,12 +55,10 @@ const Shop = () => {
   const handleAddToCart = (product) => {
     if (product.availability_status) {
       addToCart(product);
-      toast.success("Added to cart!", { autoClose: 800 });
     } else {
       toast.error("Cannot add. Product is Out of Stock!", { autoClose: 1200 });
     }
   };
-  
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -107,19 +107,31 @@ const Shop = () => {
             <div className="flex gap-2 ml-3">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-full border ${viewMode === "grid" ? "bg-gray-900 text-white" : "text-gray-600"}`}
+                className={`p-2 rounded-full border ${
+                  viewMode === "grid"
+                    ? "bg-gray-900 text-white"
+                    : "text-gray-600"
+                }`}
               >
                 <FaTh />
               </button>
               <button
                 onClick={() => setViewMode("card")}
-                className={`p-2 rounded-full border ${viewMode === "card" ? "bg-gray-900 text-white" : "text-gray-600"}`}
+                className={`p-2 rounded-full border ${
+                  viewMode === "card"
+                    ? "bg-gray-900 text-white"
+                    : "text-gray-600"
+                }`}
               >
                 <FaIdBadge />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2 rounded-full border ${viewMode === "list" ? "bg-gray-900 text-white" : "text-gray-600"}`}
+                className={`p-2 rounded-full border ${
+                  viewMode === "list"
+                    ? "bg-gray-900 text-white"
+                    : "text-gray-600"
+                }`}
               >
                 <FaThList />
               </button>

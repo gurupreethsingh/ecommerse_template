@@ -11,16 +11,24 @@
 // } from "@heroicons/react/24/outline";
 // import { FaShoppingCart } from "react-icons/fa";
 // import { AuthContext } from "../../components/auth_components/AuthManager";
+// import { CartContext } from "../../components/cart_components/CartContext";
 // import CustomeLink from "../common_components/CustomeLink";
+// import MiniCart from "../../pages/cart_pages/MiniCart";
 
 // export default function Header() {
 //   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 //   const [isDropdownOpen, setDropdownOpen] = useState(false);
 //   const [searchInput, setSearchInput] = useState("");
+
 //   const { user, isLoggedIn, logout } = useContext(AuthContext);
+//   const { cartItems } = useContext(CartContext); // ✅ Access cart items
+
 //   const navigate = useNavigate();
 
-//   const cartItemCount = 3; // TODO: replace with actual cart count from Context or Redux
+//   const cartItemCount = cartItems.reduce(
+//     (total, item) => total + item.quantity,
+//     0
+//   ); // ✅ Count properly
 
 //   const handleLogout = () => {
 //     setDropdownOpen(false);
@@ -29,7 +37,7 @@
 //   };
 
 //   const goToProfile = () => {
-//     navigate(`/profile/${user.id}`);
+//     navigate(`/profile/${user?.id}`);
 //     setDropdownOpen(false);
 //   };
 
@@ -50,7 +58,7 @@
 //   };
 
 //   const goToCart = () => {
-//     navigate("/cart");
+//     navigate("/cart"); // ✅ Opens cart
 //   };
 
 //   return (
@@ -247,9 +255,7 @@
 //   );
 // }
 
-
-// till here no add to cart functionality. 
-
+// without minicart. till here.
 
 "use client";
 
@@ -264,8 +270,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { FaShoppingCart } from "react-icons/fa";
 import { AuthContext } from "../../components/auth_components/AuthManager";
-import { CartContext } from "../../components/cart_components/CartContext"; // ✅ import CartContext
+import { CartContext } from "../../components/cart_components/CartContext";
 import CustomeLink from "../common_components/CustomeLink";
+import MiniCart from "../../pages/cart_pages/MiniCart"; // ✅ Imported properly
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -273,11 +280,14 @@ export default function Header() {
   const [searchInput, setSearchInput] = useState("");
 
   const { user, isLoggedIn, logout } = useContext(AuthContext);
-  const { cartItems } = useContext(CartContext); // ✅ Access cart items
+  const { cartItems } = useContext(CartContext);
 
   const navigate = useNavigate();
 
-  const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0); // ✅ Count properly
+  const cartItemCount = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   const handleLogout = () => {
     setDropdownOpen(false);
@@ -299,13 +309,11 @@ export default function Header() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchInput.trim() !== "") {
-      navigate(`/search-products?query=${encodeURIComponent(searchInput.trim())}`);
+      navigate(
+        `/search-products?query=${encodeURIComponent(searchInput.trim())}`
+      );
       setSearchInput("");
     }
-  };
-
-  const goToCart = () => {
-    navigate("/cart"); // ✅ Opens cart
   };
 
   return (
@@ -349,19 +357,8 @@ export default function Header() {
 
         {/* Right - Cart + Profile/Login */}
         <div className="hidden lg:flex items-center gap-6">
-          {/* Cart Icon */}
-          <button
-            onClick={goToCart}
-            className="relative text-gray-700 hover:text-black transition"
-          >
-            <FaShoppingCart className="w-6 h-6" />
-            {cartItemCount > 0 && (
-              <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs font-bold rounded-full px-1.5">
-                {cartItemCount}
-              </span>
-            )}
-          </button>
-
+          {/* Cart Icon + MiniCart */}
+          <MiniCart /> {/* ✅ NEW MiniCart inserted properly */}
           {/* Profile/Login */}
           {isLoggedIn && user ? (
             <div className="relative">
@@ -459,12 +456,12 @@ export default function Header() {
               customStyles="block text-gray-700 font-semibold text-lg hover:text-black transition"
               onClick={() => setMobileMenuOpen(false)}
             />
-            <button
-              onClick={goToCart}
-              className="block w-full text-left text-gray-700 font-semibold text-lg hover:text-black transition"
-            >
-              Cart
-            </button>
+            <CustomeLink
+              linkAddress="/cart"
+              linkName="Cart"
+              customStyles="block text-gray-700 font-semibold text-lg hover:text-black transition"
+              onClick={() => setMobileMenuOpen(false)}
+            />
 
             {isLoggedIn && user ? (
               <>
