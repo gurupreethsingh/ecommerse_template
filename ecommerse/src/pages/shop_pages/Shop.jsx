@@ -59,7 +59,7 @@ const Shop = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="containerWidth py-10 px-4 flex flex-col lg:flex-row gap-4 animate-fadeIn">
+    <div className=" py-10 px-4 flex flex-col lg:flex-row gap-4 animate-fadeIn">
       {/* Sidebar */}
       <motion.div
         initial={{ x: -100, opacity: 0 }}

@@ -100,7 +100,7 @@ const SearchProducts = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="containerWidth py-10 px-4 flex flex-col lg:flex-row gap-4 animate-fadeIn">
+    <div className=" py-10 px-4 flex flex-col lg:flex-row gap-4 animate-fadeIn">
       <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}

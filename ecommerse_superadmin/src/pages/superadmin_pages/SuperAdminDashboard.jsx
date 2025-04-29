@@ -45,11 +45,19 @@ const SuperadminDashboard = () => {
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        const [roleRes, entityRes] = await Promise.all([
+        const [roleRes, entityRes, productRes, categoryRes, subcategoryRes] = await Promise.all([
           axios.get(`${globalBackendRoute}/api/getUserCountsByRole`),
           axios.get(`${globalBackendRoute}/api/get-entity-counts`),
+          axios.get(`${globalBackendRoute}/api/count-all-products`),
+          axios.get(`${globalBackendRoute}/api/category-count`),
+          axios.get(`${globalBackendRoute}/api/count-all-subcategories`),
         ]);
-        setCounts(roleRes.data);
+        setCounts({
+          ...roleRes.data,
+          products: productRes.data.count,
+          categories: categoryRes.data.count,
+          subcategories: subcategoryRes.data.count,
+        });
         setEntities(entityRes.data);
       } catch (err) {
         console.error("Failed to fetch counts", err);
@@ -60,10 +68,20 @@ const SuperadminDashboard = () => {
 
   const userRoleCards = Object.entries(counts).map(([key, value]) => {
     if (!value || value === 0) return null;
+
     const title =
       key === "totalUsers"
         ? "Total Users"
         : key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+        const pathMap = {
+          totalUsers: "/all-users",
+          products: "/all-added-products",
+          categories: "/all-categories",
+          subcategories: "/all-subcategories",
+        };
+
+
     return {
       title,
       value,

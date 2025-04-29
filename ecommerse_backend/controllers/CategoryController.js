@@ -46,15 +46,18 @@ const addCategory = async (req, res) => {
   }
 };
 
+
 // Get all categories
+// ✅ FINAL getAllCategories
 const getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.find({}, "category_name");
+    const categories = await Category.find({}, "category_name category_image");
 
-    // Modify structure to send { _id, name }
     const formattedCategories = categories.map((cat) => ({
       _id: cat._id,
-      name: cat.category_name, // Map category_name to name
+      name: cat.category_name, // important for shop page, search, filters
+      category_name: cat.category_name, // important for display (safe fallback)
+      category_image: cat.category_image, // important for AllCategories page
     }));
 
     res.status(200).json(formattedCategories);
@@ -63,6 +66,8 @@ const getAllCategories = async (req, res) => {
     res.status(500).json({ message: "Error fetching categories" });
   }
 };
+
+
 
 // Get category by ID
 const getCategoryById = async (req, res) => {

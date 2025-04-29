@@ -50,7 +50,7 @@ const MainLayout = () => {
   return (
     <div className="min-h-screen text-gray-900">
       <Header />
-      <main className="flex-grow containerWidth py-6">
+      <main className="flex-grow py-6">
         <Routes>
           <Route
             path="/"

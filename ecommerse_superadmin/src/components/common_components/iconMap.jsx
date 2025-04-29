@@ -9,6 +9,8 @@ import {
   FaBuilding,
   FaLayerGroup,
   FaBoxes,
+  FaList,
+  FaThLarge,
 } from "react-icons/fa";
 
 const iconMap = {
@@ -22,6 +24,8 @@ const iconMap = {
   totalUsers: <FaUsers className="text-blue-600 text-3xl" />,
   category: <FaLayerGroup className="text-yellow-600 text-3xl" />,
   product: <FaBoxes className="text-green-600 text-3xl" />,
+  categories: <FaList className="text-green-500 text-3xl"/>,
+  subcategories: <FaThLarge className="text-red-600 text-3xl"/>,
 };
 
 export default iconMap;
