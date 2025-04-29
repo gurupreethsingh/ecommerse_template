@@ -1,20 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import FiltersSidebar from "../../components/shop_components/FiltersSidebar";
 import ProductGrid from "../../components/shop_components/ProductGrid";
 import ProductCard from "../../components/shop_components/ProductCard";
 import ProductList from "../../components/shop_components/ProductList";
 import Pagination from "../../components/shop_components/Pagination";
 import axios from "axios";
+import { CartContext } from "../../components/cart_components/CartContext";
 import globalBackendRoute from "../../config/Config";
 import { motion } from "framer-motion";
 import { FaTh, FaThList, FaIdBadge } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 const Shop = () => {
   const [allProducts, setAllProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState("grid"); // grid | card | list
+  const [viewMode, setViewMode] = useState("grid");
+
+  const { addToCart } = useContext(CartContext); // 🛒
 
   const productsPerPage =
     viewMode === "grid" ? 12 : viewMode === "card" ? 9 : 10;
@@ -22,9 +26,7 @@ const Shop = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          `${globalBackendRoute}/api/all-added-products`
-        );
+        const res = await axios.get(`${globalBackendRoute}/api/all-added-products`);
         const products = res.data || [];
         setAllProducts(products);
         setFilteredProducts(products);
@@ -32,7 +34,6 @@ const Shop = () => {
         console.error("Failed to fetch products:", error.message);
       }
     };
-
     fetchData();
   }, []);
 
@@ -49,6 +50,16 @@ const Shop = () => {
     );
   };
 
+  const handleAddToCart = (product) => {
+    if (product.availability_status) {
+      addToCart(product);
+      toast.success("Added to cart!", { autoClose: 800 });
+    } else {
+      toast.error("Cannot add. Product is Out of Stock!", { autoClose: 1200 });
+    }
+  };
+  
+
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(
@@ -59,8 +70,7 @@ const Shop = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className=" py-10 px-4 flex flex-col lg:flex-row gap-4 animate-fadeIn">
-      {/* Sidebar */}
+    <div className="py-10 px-4 flex flex-col lg:flex-row gap-4 animate-fadeIn">
       <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
@@ -73,7 +83,6 @@ const Shop = () => {
         />
       </motion.div>
 
-      {/* Main Section */}
       <motion.div
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
@@ -90,7 +99,6 @@ const Shop = () => {
             Our Products
           </motion.h1>
 
-          {/* View mode buttons */}
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-500 hidden md:inline">
               ({filteredProducts.length} items)
@@ -99,31 +107,19 @@ const Shop = () => {
             <div className="flex gap-2 ml-3">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-full border ${
-                  viewMode === "grid"
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-600"
-                }`}
+                className={`p-2 rounded-full border ${viewMode === "grid" ? "bg-gray-900 text-white" : "text-gray-600"}`}
               >
                 <FaTh />
               </button>
               <button
                 onClick={() => setViewMode("card")}
-                className={`p-2 rounded-full border ${
-                  viewMode === "card"
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-600"
-                }`}
+                className={`p-2 rounded-full border ${viewMode === "card" ? "bg-gray-900 text-white" : "text-gray-600"}`}
               >
                 <FaIdBadge />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2 rounded-full border ${
-                  viewMode === "list"
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-600"
-                }`}
+                className={`p-2 rounded-full border ${viewMode === "list" ? "bg-gray-900 text-white" : "text-gray-600"}`}
               >
                 <FaThList />
               </button>
@@ -150,8 +146,9 @@ const Shop = () => {
               {viewMode === "grid" && (
                 <ProductGrid
                   products={currentProducts}
+                  handleAddToCart={handleAddToCart}
+                  handleToggleWishlist={handleWishlistToggle}
                   wishlist={wishlist}
-                  onWishlistToggle={handleWishlistToggle}
                 />
               )}
               {viewMode === "card" && (
@@ -159,6 +156,7 @@ const Shop = () => {
                   products={currentProducts}
                   wishlist={wishlist}
                   onWishlistToggle={handleWishlistToggle}
+                  handleAddToCart={handleAddToCart}
                 />
               )}
               {viewMode === "list" && (
@@ -166,6 +164,7 @@ const Shop = () => {
                   products={currentProducts}
                   wishlist={wishlist}
                   onWishlistToggle={handleWishlistToggle}
+                  handleAddToCart={handleAddToCart}
                 />
               )}
             </motion.div>

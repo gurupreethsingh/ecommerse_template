@@ -36,14 +36,36 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (token) => {
+  const login = async (token) => {
     localStorage.setItem("token", token);
     const decoded = decodeToken(token);
     if (decoded) {
       setUser(decoded);
       setIsLoggedIn(true);
+  
+      // 🛒 After login, synchronize cart
+      try {
+        const localCart = JSON.parse(localStorage.getItem("cart")) || [];
+  
+        if (localCart.length > 0) {
+          await fetch(`${globalBackendRoute}/api/cart/sync`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ items: localCart }),
+          });
+  
+          // 🧹 After successful sync, remove local cart
+          localStorage.removeItem("cart");
+        }
+      } catch (error) {
+        console.error("Cart sync failed:", error);
+      }
     }
   };
+  
 
   const logout = () => {
     localStorage.removeItem("token");

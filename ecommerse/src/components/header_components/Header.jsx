@@ -1,226 +1,3 @@
-// // "use client";
-
-// // import { useContext, useMemo, useState } from "react";
-// // import { useNavigate } from "react-router-dom";
-// // import { Dialog, DialogPanel } from "@headlessui/react";
-// // import {
-// //   Bars3Icon,
-// //   XMarkIcon,
-// //   ChevronDownIcon,
-// //   MagnifyingGlassIcon,
-// // } from "@heroicons/react/24/outline";
-// // import { AuthContext } from "../../components/auth_components/AuthManager";
-// // import CustomeLink from "../common_components/CustomeLink";
-
-// // export default function Header() {
-// //   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-// //   const [isDropdownOpen, setDropdownOpen] = useState(false);
-// //   const [searchInput, setSearchInput] = useState("");
-// //   const { user, isLoggedIn, logout } = useContext(AuthContext);
-// //   const navigate = useNavigate();
-
-// //   const handleLogout = () => {
-// //     setDropdownOpen(false);
-// //     logout();
-// //     navigate("/home");
-// //   };
-
-// //   const goToProfile = () => {
-// //     navigate(`/profile/${user.id}`);
-// //     setDropdownOpen(false);
-// //   };
-
-// //   const toggleDropdown = () => {
-// //     setDropdownOpen(!isDropdownOpen);
-// //   };
-
-// //   const dashboardRoute = useMemo(() => {
-// //     if (!user?.role) return "/dashboard";
-// //     const roleRoutes = { user: "/dashboard" };
-// //     return roleRoutes[user.role] || "/dashboard";
-// //   }, [user?.role]);
-
-// //   const handleDashboardClick = () => {
-// //     if (isLoggedIn) {
-// //       navigate(dashboardRoute);
-// //     } else {
-// //       navigate("/login");
-// //     }
-// //   };
-
-// //   const handleSearch = (e) => {
-// //     e.preventDefault();
-// //     if (searchInput.trim() !== "") {
-// //       navigate(
-// //         `/search-products?query=${encodeURIComponent(searchInput.trim())}`
-// //       );
-// //       setSearchInput("");
-// //     }
-// //   };
-
-// //   return (
-// //     <header>
-// //       <nav className="bg-white" aria-label="Global">
-// //         <div className="containerWidth flex items-center justify-between py-2">
-// //           {/* Logo */}
-// //           <div className="flex lg:flex-1">
-// //             <div className="mr-2">
-// //               <CustomeLink linkAddress="/home" linkName="ECOMMERSE" />
-// //             </div>
-
-// //             <div className="mr-2">
-// //               <CustomeLink linkAddress="/shop" linkName="Shop All" />
-// //             </div>
-// //           </div>
-
-// //           {/* Desktop Search */}
-// //           <div className="hidden lg:flex flex-1 justify-center">
-// //             <form onSubmit={handleSearch} className="flex w-full max-w-2xl">
-// //               <div className="flex items-center w-full rounded-full border border-gray-300 px-4 py-2">
-// //                 <input
-// //                   type="text"
-// //                   placeholder="Search for products..."
-// //                   className="flex-grow bg-transparent outline-none text-gray-700 placeholder-gray-400"
-// //                   value={searchInput}
-// //                   onChange={(e) => setSearchInput(e.target.value)}
-// //                 />
-// //                 <button
-// //                   type="submit"
-// //                   className="flex items-center justify-center"
-// //                 >
-// //                   <MagnifyingGlassIcon className="w-5 h-5 text-gray-500" />
-// //                 </button>
-// //               </div>
-// //             </form>
-// //           </div>
-
-// //           {/* Right - Profile/Login */}
-// //           <div className="hidden lg:flex lg:flex-1 lg:justify-end items-center">
-// //             {isLoggedIn && user ? (
-// //               <div className="relative">
-// //                 <button
-// //                   onClick={toggleDropdown}
-// //                   className="flex items-center gap-2 font-medium linkText"
-// //                 >
-// //                   {user.name}
-// //                   <ChevronDownIcon className="w-5 h-5 text-gray-400" />
-// //                 </button>
-// //                 {isDropdownOpen && (
-// //                   <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-10 text-gray-800">
-// //                     <button
-// //                       onClick={goToProfile}
-// //                       className="block w-full text-left px-4 py-2 smallText hover:bg-gray-100"
-// //                     >
-// //                       Profile
-// //                     </button>
-// //                     <button
-// //                       onClick={handleLogout}
-// //                       className="block w-full text-left px-4 py-2 smallText text-red-600 hover:bg-gray-100"
-// //                     >
-// //                       Logout
-// //                     </button>
-// //                   </div>
-// //                 )}
-// //               </div>
-// //             ) : (
-// //               <CustomeLink linkAddress="/login" linkName="Login" />
-// //             )}
-// //           </div>
-
-// //           {/* Mobile menu toggle */}
-// //           <div className="flex lg:hidden">
-// //             <button
-// //               type="button"
-// //               onClick={() => setMobileMenuOpen(true)}
-// //               className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-white"
-// //             >
-// //               <Bars3Icon className="h-6 w-6 text-black" />
-// //             </button>
-// //           </div>
-// //         </div>
-// //       </nav>
-
-// //       {/* Mobile Menu */}
-// //       <Dialog
-// //         as="div"
-// //         className="lg:hidden"
-// //         open={mobileMenuOpen}
-// //         onClose={setMobileMenuOpen}
-// //       >
-// //         <div className="fixed inset-0 z-10" />
-// //         <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full max-w-sm bg-gray-100 linkText px-6 py-6 overflow-y-auto">
-// //           <div className="flex items-center justify-between">
-// //             <CustomeLink linkAddress="/home" linkName="LOGO" />
-// //             <button
-// //               type="button"
-// //               onClick={() => setMobileMenuOpen(false)}
-// //               className="-m-2.5 rounded-md p-2.5"
-// //             >
-// //               <XMarkIcon className="h-6 w-6" />
-// //             </button>
-// //           </div>
-
-// //           {/* Mobile Search */}
-// //           <div className="mt-6">
-// //             <form onSubmit={handleSearch} className="flex">
-// //               <div className="flex items-center w-full rounded-full border border-gray-300 px-4 py-2">
-// //                 <input
-// //                   type="text"
-// //                   placeholder="Search for products..."
-// //                   className="flex-grow bg-transparent outline-none text-gray-700 placeholder-gray-400"
-// //                   value={searchInput}
-// //                   onChange={(e) => setSearchInput(e.target.value)}
-// //                 />
-// //                 <button
-// //                   type="submit"
-// //                   className="flex items-center justify-center"
-// //                 >
-// //                   <MagnifyingGlassIcon className="w-5 h-5 text-gray-500" />
-// //                 </button>
-// //               </div>
-// //             </form>
-// //           </div>
-
-// //           {/* Mobile Profile/Login */}
-// //           <div className="mt-6 flow-root">
-// //             <div className="-my-6 divide-y divide-gray-700">
-// //               <div className="py-6">
-// //                 {isLoggedIn && user ? (
-// //                   <div className="space-y-2">
-// //                     <button
-// //                       onClick={() => {
-// //                         goToProfile();
-// //                         setMobileMenuOpen(false);
-// //                       }}
-// //                       className="block w-full text-left px-3 py-2 text-base font-semibold hover:bg-gray-800 hover:text-gray-50 paragraphTextMobile"
-// //                     >
-// //                       Profile
-// //                     </button>
-// //                     <button
-// //                       onClick={() => {
-// //                         setDropdownOpen(false);
-// //                         handleLogout();
-// //                         setMobileMenuOpen(false);
-// //                       }}
-// //                       className="block w-full text-left px-3 py-2 text-base font-semibold text-red-400 hover:bg-gray-700 paragraphTextMobile"
-// //                     >
-// //                       Logout
-// //                     </button>
-// //                   </div>
-// //                 ) : (
-// //                   <CustomeLink linkAddress="/login" linkName="Login" />
-// //                 )}
-// //               </div>
-// //             </div>
-// //           </div>
-// //         </DialogPanel>
-// //       </Dialog>
-// //     </header>
-// //   );
-// // }
-
-// //
-
 // "use client";
 
 // import { useContext, useMemo, useState } from "react";
@@ -232,6 +9,7 @@
 //   ChevronDownIcon,
 //   MagnifyingGlassIcon,
 // } from "@heroicons/react/24/outline";
+// import { FaShoppingCart } from "react-icons/fa";
 // import { AuthContext } from "../../components/auth_components/AuthManager";
 // import CustomeLink from "../common_components/CustomeLink";
 
@@ -241,6 +19,8 @@
 //   const [searchInput, setSearchInput] = useState("");
 //   const { user, isLoggedIn, logout } = useContext(AuthContext);
 //   const navigate = useNavigate();
+
+//   const cartItemCount = 3; // TODO: replace with actual cart count from Context or Redux
 
 //   const handleLogout = () => {
 //     setDropdownOpen(false);
@@ -267,6 +47,10 @@
 //       );
 //       setSearchInput("");
 //     }
+//   };
+
+//   const goToCart = () => {
+//     navigate("/cart");
 //   };
 
 //   return (
@@ -308,8 +92,22 @@
 //           </form>
 //         </div>
 
-//         {/* Right - Profile / Login */}
+//         {/* Right - Cart + Profile/Login */}
 //         <div className="hidden lg:flex items-center gap-6">
+//           {/* Cart Icon */}
+//           <button
+//             onClick={goToCart}
+//             className="relative text-gray-700 hover:text-black transition"
+//           >
+//             <FaShoppingCart className="w-6 h-6" />
+//             {cartItemCount > 0 && (
+//               <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs font-bold rounded-full px-1.5">
+//                 {cartItemCount}
+//               </span>
+//             )}
+//           </button>
+
+//           {/* Profile/Login */}
 //           {isLoggedIn && user ? (
 //             <div className="relative">
 //               <button
@@ -399,13 +197,19 @@
 //           </form>
 
 //           {/* Mobile Links */}
-//           <div className="space-y-4">
+//           <div className="space-y-6">
 //             <CustomeLink
 //               linkAddress="/shop"
 //               linkName="Shop All"
-//               customStyles="block text-gray-700 font-medium text-lg hover:text-black transition"
+//               customStyles="block text-gray-700 font-semibold text-lg hover:text-black transition"
 //               onClick={() => setMobileMenuOpen(false)}
 //             />
+//             <button
+//               onClick={goToCart}
+//               className="block w-full text-left text-gray-700 font-semibold text-lg hover:text-black transition"
+//             >
+//               Cart
+//             </button>
 
 //             {isLoggedIn && user ? (
 //               <>
@@ -414,7 +218,7 @@
 //                     goToProfile();
 //                     setMobileMenuOpen(false);
 //                   }}
-//                   className="block w-full text-left text-gray-700 font-medium text-lg hover:text-black transition"
+//                   className="block w-full text-left text-gray-700 font-semibold text-lg hover:text-black transition"
 //                 >
 //                   Profile
 //                 </button>
@@ -423,7 +227,7 @@
 //                     handleLogout();
 //                     setMobileMenuOpen(false);
 //                   }}
-//                   className="block w-full text-left text-red-500 font-medium text-lg hover:text-red-700 transition"
+//                   className="block w-full text-left text-red-500 font-semibold text-lg hover:text-red-700 transition"
 //                 >
 //                   Logout
 //                 </button>
@@ -432,7 +236,7 @@
 //               <CustomeLink
 //                 linkAddress="/login"
 //                 linkName="Login"
-//                 customStyles="block text-gray-700 font-medium text-lg hover:text-black transition"
+//                 customStyles="block text-gray-700 font-semibold text-lg hover:text-black transition"
 //                 onClick={() => setMobileMenuOpen(false)}
 //               />
 //             )}
@@ -443,7 +247,9 @@
 //   );
 // }
 
-//
+
+// till here no add to cart functionality. 
+
 
 "use client";
 
@@ -458,16 +264,20 @@ import {
 } from "@heroicons/react/24/outline";
 import { FaShoppingCart } from "react-icons/fa";
 import { AuthContext } from "../../components/auth_components/AuthManager";
+import { CartContext } from "../../components/cart_components/CartContext"; // ✅ import CartContext
 import CustomeLink from "../common_components/CustomeLink";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
+
   const { user, isLoggedIn, logout } = useContext(AuthContext);
+  const { cartItems } = useContext(CartContext); // ✅ Access cart items
+
   const navigate = useNavigate();
 
-  const cartItemCount = 3; // TODO: replace with actual cart count from Context or Redux
+  const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0); // ✅ Count properly
 
   const handleLogout = () => {
     setDropdownOpen(false);
@@ -476,7 +286,7 @@ export default function Header() {
   };
 
   const goToProfile = () => {
-    navigate(`/profile/${user.id}`);
+    navigate(`/profile/${user?.id}`);
     setDropdownOpen(false);
   };
 
@@ -489,15 +299,13 @@ export default function Header() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchInput.trim() !== "") {
-      navigate(
-        `/search-products?query=${encodeURIComponent(searchInput.trim())}`
-      );
+      navigate(`/search-products?query=${encodeURIComponent(searchInput.trim())}`);
       setSearchInput("");
     }
   };
 
   const goToCart = () => {
-    navigate("/cart");
+    navigate("/cart"); // ✅ Opens cart
   };
 
   return (

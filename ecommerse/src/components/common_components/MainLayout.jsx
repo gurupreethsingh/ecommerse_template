@@ -33,8 +33,12 @@ import SearchProducts from "../../pages/product_pages/SearchProducts";
 import Shop from "../../pages/shop_pages/Shop";
 import SingleProduct from "../../pages/shop_pages/SingleProduct";
 
+// cart pages. 
+import CartPage from "../../pages/cart_pages/CartPage";
+
 const MainLayout = () => {
   return (
+
     <div className="min-h-screen text-gray-900">
       <Header />
       <main className="flex-grow containerWidth py-6">
@@ -169,6 +173,16 @@ const MainLayout = () => {
             }
           />
 
+                    {/* cart pages  */}
+                    <Route
+            path="/cart"
+            element={
+              <PageTitle title="Cart Page">
+                <CartPage />
+              </PageTitle>
+            }
+          />
+
           <Route
             path="/page-not-found"
             element={
@@ -189,6 +203,7 @@ const MainLayout = () => {
       </main>
       <Footer />
     </div>
+
   );
 };
 
