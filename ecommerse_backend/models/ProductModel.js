@@ -3,7 +3,7 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
-  product_name: { type: String, required: true , trim: true },
+  product_name: { type: String, required: true, trim: true },
   slug: { type: String, unique: true },
   product_image: { type: String, required: false },
   all_product_images: [{ type: String }],
@@ -22,8 +22,8 @@ const productSchema = new mongoose.Schema({
     ref: "SubCategory",
     required: false,
   },
-  brand: { type: String, required: true, trim: true  },
-  barcode: { type: String , trim: true },
+  brand: { type: String, required: true, trim: true },
+  barcode: { type: String, trim: true },
   stock: { type: Number, required: true },
   warehouse_stock: [
     {
@@ -37,7 +37,7 @@ const productSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Outlet",
     required: true,
-    default: "6809f7f0ed9f36edb58306b4" // dummy outlet id
+    default: "6809f7f0ed9f36edb58306b4", // dummy outlet id
   },
 
   dimensions: {
@@ -45,8 +45,8 @@ const productSchema = new mongoose.Schema({
     width: { type: Number },
     height: { type: Number },
   },
-  color: { type: String , trim: true },
-  material: { type: String , trim: true },
+  color: { type: String, trim: true },
+  material: { type: String, trim: true },
   ratings: { type: Number, default: 0 },
   avg_rating: { type: Number, default: 0 },
   total_reviews: { type: Number, default: 0 },
@@ -94,7 +94,7 @@ const productSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Vendor",
     required: true,
-    default: "6809f7f0ed9f36edb58306c5" // dummy vendor id
+    default: "6809f7f0ed9f36edb58306c5", // dummy vendor id
   },
   reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
   orders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }],

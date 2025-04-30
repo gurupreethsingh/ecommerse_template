@@ -185,10 +185,20 @@ exports.getProductById = async (req, res) => {
     const product = await Product.findById(req.params.id)
       .populate("category")
       .populate("subcategory")
-      .populate("vendor");
+      .populate("vendor")
+      .populate({
+        path: "related_products",
+        select: "product_name product_image selling_price",
+      })
+      .populate({
+        path: "bundles.items.product",
+        select: "product_name product_image selling_price",
+      });
+
     if (!product || product.isDeleted) {
       return res.status(404).json({ message: "Product not found." });
     }
+
     res.status(200).json(product);
   } catch (error) {
     console.error("Get Product By ID Error:", error);
