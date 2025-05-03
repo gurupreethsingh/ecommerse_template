@@ -592,7 +592,7 @@ const SingleProduct = () => {
   }
 
   return (
-    <div className="containerWidth py-10 px-4 flex flex-col gap-10">
+    <div className=" py-10 flex flex-col gap-10">
       <div className="flex flex-col lg:flex-row gap-10">
         <div className="flex flex-col lg:flex-row gap-4 w-full lg:w-1/2">
           <div className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto">
@@ -602,7 +602,7 @@ const SingleProduct = () => {
                   key={idx}
                   src={getImageUrl(img)}
                   alt="thumbnail"
-                  className="w-16 h-16 rounded-lg border cursor-pointer object-cover hover:scale-105 transition"
+                  className="w-16 h-16 border  rounded-lg  cursor-pointer object-cover hover:scale-110 transition"
                   onClick={() => setMainImage(img)}
                 />
               )

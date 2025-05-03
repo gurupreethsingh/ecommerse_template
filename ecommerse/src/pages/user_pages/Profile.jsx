@@ -75,7 +75,7 @@ export default function Profile() {
         {/* User Info */}
         <div className="w-full">
           <motion.h3
-            className="subHeadingTextMobile lg:subHeadingText mb-4"
+            className="text-2xl mb-4 font-extrabold"
             initial={{ x: -30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
           >
@@ -134,7 +134,8 @@ export default function Profile() {
           <div className="mt-6 text-center">
             <button
               onClick={handleUpdateProfile}
-              className="primaryBtn w-fit px-4 flex items-center gap-2 rounded-full mx-auto"
+              className=" w-fit px-4 py-2 flex items-center gap-2  bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold rounded-full shadow hover:from-red-700 hover:to-orange-600 transition"
+              // className="w-fit py-2 px-4 bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold rounded-full shadow hover:from-red-700 hover:to-orange-600 transition"
             >
               <MdEdit /> Update
             </button>

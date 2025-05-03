@@ -40,6 +40,15 @@ const MyOrders = () => {
     return `${globalBackendRoute}/uploads/products/${normalized}`;
   };
 
+  const formatAddress = (addr) => {
+    if (!addr || typeof addr !== "object") return "N/A";
+    const { addressLine1, addressLine2, city, state, postalCode, country } =
+      addr;
+    return `${addressLine1 || ""}, ${addressLine2 || ""}, ${city || ""}, ${
+      state || ""
+    }, ${postalCode || ""}, ${country || ""}`;
+  };
+
   return (
     <div className="containerWidth py-10 px-4 animate-fadeIn font-sans">
       <h1 className="text-4xl font-extrabold text-gray-800 mb-10 flex items-center gap-3">
@@ -107,12 +116,14 @@ const MyOrders = () => {
               ))}
             </div>
 
-            <div className="mt-4 text-gray-700 text-sm">
+            <div className="mt-4 text-gray-700 text-sm space-y-1">
               <p>
-                <strong>Billing Address:</strong> {order.billingAddress}
+                <strong>Billing Address:</strong>{" "}
+                {formatAddress(order.billingAddress)}
               </p>
               <p>
-                <strong>Shipping Address:</strong> {order.shippingAddress}
+                <strong>Shipping Address:</strong>{" "}
+                {formatAddress(order.shippingAddress)}
               </p>
             </div>
 

@@ -9,7 +9,12 @@ import PageTitle from "./PageTitle";
 // Pages
 import Homepage from "../../pages/common_pages/Homepage";
 import PageNotFound from "../../pages/common_pages/PageNotFound";
+// contact page.
 import ContactUs from "../../pages/common_pages/ContactUs";
+import AllMessages from "../../pages/contact_pages/AllMessages";
+import ReplyMessage from "../../pages/contact_pages/ReplyMessage";
+import AllReplies from "../../pages/contact_pages/AllReplies";
+
 import AboutUs from "../../pages/common_pages/AboutUs";
 import Register from "../../pages/user_pages/Register";
 import Login from "../../pages/user_pages/Login";
@@ -85,13 +90,40 @@ const MainLayout = () => {
           <Route
             path="/contact-us"
             element={
-              <PrivateRoute>
+              <PublicRoute>
                 <PageTitle title="Contact Us">
                   <ContactUs />
                 </PageTitle>
+              </PublicRoute>
+            }
+          />
+
+          <Route
+            path="/all-messages"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <AllMessages />
               </PrivateRoute>
             }
           />
+          <Route
+            path="/reply-message/:id"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <ReplyMessage />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/all-replies"
+            element={
+              <PrivateRoute allowedRoles={["superadmin"]}>
+                <AllReplies />
+              </PrivateRoute>
+            }
+          />
+
           <Route
             path="/about-us"
             element={

@@ -1,76 +1,116 @@
-import React, { useContext } from "react";
-import CustomeLink from "../common_components/CustomeLink";
-import { AuthContext } from "../../components/auth_components/AuthManager";
+// Footer.jsx
+import React from "react";
+// import SubscriptionForm from "./SubscriptionForm";
+import { FaFacebookF, FaTwitter, FaGithub, FaLinkedinIn } from "react-icons/fa";
 
 const Footer = () => {
-  const { isLoggedIn } = useContext(AuthContext);
-
-  const sections = [
-    {
-      title: "Quick Links",
-      links: isLoggedIn
-        ? [
-            { name: "Home", path: "/home" },
-            { name: "About Us", path: "/about-us" },
-            { name: "Contact Us", path: "/contact-us" },
-          ]
-        : [],
-    },
-    {
-      title: "Follow Us",
-      links: [
-        { name: "Facebook", path: "https://www.facebook.com" },
-        { name: "Instagram", path: "https://www.instagram.com" },
-        { name: "Twitter", path: "https://www.twitter.com" },
-        { name: "LinkedIn", path: "https://www.linkedin.com" },
-      ],
-    },
-    {
-      title: "Policies",
-      links: [
-        { name: "Privacy Policy", path: "#" },
-        { name: "Return Policy", path: "#" },
-      ],
-    },
-  ];
-
   return (
-    <footer className="bg-gray-700 text-white pt-8">
-      <div className="container mx-auto px-4 flex flex-wrap justify-between gap-8">
-        {sections.map(
-          (section, idx) =>
-            section.links.length > 0 && (
-              <div key={idx} className="min-w-[150px]">
-                <h2 className="text-lg font-semibold mb-4">{section.title}</h2>
-                <ul className="space-y-2">
-                  {section.links.map((link, i) => (
-                    <li key={i}>
-                      <CustomeLink
-                        linkAddress={link.path}
-                        linkName={link.name}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )
-        )}
+    <footer className="bg-gray-800 text-gray-300 pt-12 pb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Top Section */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          {/* Company Info */}
+          <div>
+            <h3 className="text-white text-lg font-semibold mb-4">Company</h3>
+            <ul className="space-y-2">
+              <li>
+                <a href="/about-us" className="hover:text-white transition">
+                  About Us
+                </a>
+              </li>
+              <li>
+                <a href="/contact-us" className="hover:text-white transition">
+                  Contact Us
+                </a>
+              </li>
+              <li>
+                <a href="/careers" className="hover:text-white transition">
+                  Careers
+                </a>
+              </li>
+            </ul>
+          </div>
 
-        <div className="min-w-[200px]">
-          <h2 className="text-lg font-semibold mb-4">Address</h2>
-          <p className="text-sm font-medium leading-relaxed">
-            ECODERS <br />
-            #198, Defence Colony, <br />
-            Hesaraghatta Road, <br />
-            Bangalore 560073.
+          {/* Support */}
+          <div>
+            <h3 className="text-white text-lg font-semibold mb-4">Support</h3>
+            <ul className="space-y-2">
+              <li>
+                <a href="/help-center" className="hover:text-white transition">
+                  Help Center
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/privacy-policy"
+                  className="hover:text-white transition"
+                >
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/terms-of-service"
+                  className="hover:text-white transition"
+                >
+                  Terms of Service
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Social Media */}
+          <div>
+            <h3 className="text-white text-lg font-semibold mb-4">Follow Us</h3>
+            <div className="flex space-x-4">
+              <a href="#" className="hover:text-white transition">
+                <FaFacebookF />
+              </a>
+              <a href="#" className="hover:text-white transition">
+                <FaTwitter />
+              </a>
+              <a href="#" className="hover:text-white transition">
+                <FaGithub />
+              </a>
+              <a href="#" className="hover:text-white transition">
+                <FaLinkedinIn />
+              </a>
+            </div>
+          </div>
+
+          {/* Subscription Form */}
+          {/* <div>
+            <h3 className="text-white text-lg font-semibold mb-4">Subscribe</h3>
+            <SubscriptionForm />
+          </div> */}
+
+          <div>
+            <h3 className="text-white text-lg font-semibold mb-4">Address</h3>
+            <div className=" space-x-4">
+              <a href="#" className="hover:text-white transition">
+                Ecoders, Hesaraghatta Road,
+              </a>
+              <a href="#" className="hover:text-white transition">
+                Bagalagunte, Defence Colony
+              </a>
+              <a href="#" className="hover:text-white transition">
+                Bangalore
+              </a>
+              <a href="#" className="hover:text-white transition">
+                Pin Code - 560057
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="border-t border-gray-700 pt-6 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-sm">
+            &copy; 2025 Ecoders, Inc. All rights reserved.
           </p>
+          <p className="text-sm mt-4 md:mt-0">Made with ❤️ in Bengaluru</p>
         </div>
       </div>
-
-      <p className="bg-gray-800 text-white text-center text-xs py-4 mt-8">
-        &copy; {new Date().getFullYear()} ECODERS, Bangalore. All rights
-        reserved.
-      </p>
     </footer>
   );
 };

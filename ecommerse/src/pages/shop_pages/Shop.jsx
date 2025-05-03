@@ -6,6 +6,7 @@ import ProductList from "../../components/shop_components/ProductList";
 import Pagination from "../../components/shop_components/Pagination";
 import axios from "axios";
 import { CartContext } from "../../components/cart_components/CartContext";
+import { WishlistContext } from "../../components/wishlist_components/WishlistContext";
 import globalBackendRoute from "../../config/Config";
 import { motion } from "framer-motion";
 import { FaTh, FaThList, FaIdBadge } from "react-icons/fa";
@@ -14,11 +15,14 @@ import { toast } from "react-toastify";
 const Shop = () => {
   const [allProducts, setAllProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState("grid");
+  const [showAnimatedMsg, setShowAnimatedMsg] = useState(false);
+  const [animatedMsgProductName, setAnimatedMsgProductName] = useState("");
 
-  const { addToCart } = useContext(CartContext); // 🛒
+  const { addToCart } = useContext(CartContext);
+  const { wishlistItems, addToWishlist, removeFromWishlist, fetchWishlist } =
+    useContext(WishlistContext);
 
   const productsPerPage =
     viewMode === "grid" ? 12 : viewMode === "card" ? 9 : 10;
@@ -37,6 +41,7 @@ const Shop = () => {
       }
     };
     fetchData();
+    fetchWishlist();
   }, []);
 
   const handleFilterChange = (newFilteredProducts) => {
@@ -44,12 +49,27 @@ const Shop = () => {
     setCurrentPage(1);
   };
 
-  const handleWishlistToggle = (productId) => {
-    setWishlist((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
+  const handleWishlistToggle = async (product) => {
+    const productId = product._id;
+    const productName = product.product_name;
+
+    const wishlistIds = wishlistItems.map(
+      (item) => item._id || item.product?._id
     );
+
+    if (wishlistIds.includes(productId)) {
+      await removeFromWishlist(productId);
+      setAnimatedMsgProductName(`❌ ${productName} removed from wishlist`);
+      setShowAnimatedMsg(true);
+      setTimeout(() => setShowAnimatedMsg(false), 2000);
+    } else {
+      const success = await addToWishlist(productId, product);
+      if (success) {
+        setAnimatedMsgProductName(`✨ ${productName} added to wishlist`);
+        setShowAnimatedMsg(true);
+        setTimeout(() => setShowAnimatedMsg(false), 2000);
+      }
+    }
   };
 
   const handleAddToCart = (product) => {
@@ -71,11 +91,22 @@ const Shop = () => {
 
   return (
     <div className="py-10 px-4 flex flex-col lg:flex-row gap-4 animate-fadeIn">
+      {showAnimatedMsg && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="fixed top-20 right-4 z-50 bg-gradient-to-r from-pink-500 via-orange-600 to-orange-400 text-white px-4 py-2 rounded-full shadow-lg animate-pulse"
+        >
+          {animatedMsgProductName}
+        </motion.div>
+      )}
+
       <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className="w-full lg:w-1/4 bg-gradient-to-br rounded-lg"
+        className="w-full lg:w-1/5 bg-gradient-to-br rounded-lg"
       >
         <FiltersSidebar
           allProducts={allProducts}
@@ -160,22 +191,28 @@ const Shop = () => {
                   products={currentProducts}
                   handleAddToCart={handleAddToCart}
                   handleToggleWishlist={handleWishlistToggle}
-                  wishlist={wishlist}
+                  wishlist={wishlistItems.map(
+                    (item) => item._id || item.product?._id
+                  )}
                 />
               )}
               {viewMode === "card" && (
                 <ProductCard
                   products={currentProducts}
-                  wishlist={wishlist}
-                  onWishlistToggle={handleWishlistToggle}
+                  wishlist={wishlistItems.map(
+                    (item) => item._id || item.product?._id
+                  )}
+                  handleToggleWishlist={handleWishlistToggle}
                   handleAddToCart={handleAddToCart}
                 />
               )}
               {viewMode === "list" && (
                 <ProductList
                   products={currentProducts}
-                  wishlist={wishlist}
-                  onWishlistToggle={handleWishlistToggle}
+                  wishlist={wishlistItems.map(
+                    (item) => item._id || item.product?._id
+                  )}
+                  handleToggleWishlist={handleWishlistToggle}
                   handleAddToCart={handleAddToCart}
                 />
               )}

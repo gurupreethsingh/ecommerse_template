@@ -15,11 +15,11 @@ const orderSchema = new mongoose.Schema(
       default: null, // for guest checkout
     },
     billingAddress: {
-      type: String,
+      type: Object,
       required: true,
     },
     shippingAddress: {
-      type: String,
+      type: Object,
       required: true,
     },
     items: [orderItemSchema],

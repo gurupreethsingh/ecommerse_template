@@ -39,11 +39,14 @@ import CheckoutPage from "../../pages/cart_pages/CheckoutPage";
 import MyOrders from "../../pages/orders_page/MyOrders";
 import ThankYou from "../../pages/orders_page/ThankYou";
 
+// wishlist page..
+import Wishlist from "../../pages/wishlist_pages/Wishlist";
+
 const MainLayout = () => {
   return (
     <div className="min-h-screen text-gray-900">
       <Header />
-      <main className="flex-grow containerWidth py-6">
+      <main className="flex-grow container py-6">
         <Routes>
           <Route
             path="/"
@@ -179,7 +182,7 @@ const MainLayout = () => {
           <Route
             path="/cart"
             element={
-              <PageTitle title="Cart Page">
+              <PageTitle title="Cart">
                 <CartPage />
               </PageTitle>
             }
@@ -188,7 +191,7 @@ const MainLayout = () => {
           <Route
             path="/checkout"
             element={
-              <PageTitle title="Checkout Page">
+              <PageTitle title="Checkout">
                 <CheckoutPage />
               </PageTitle>
             }
@@ -197,7 +200,7 @@ const MainLayout = () => {
           <Route
             path="/my-orders"
             element={
-              <PageTitle title="Myorders Page">
+              <PageTitle title="Myorders">
                 <MyOrders />
               </PageTitle>
             }
@@ -206,8 +209,17 @@ const MainLayout = () => {
           <Route
             path="/thank-you"
             element={
-              <PageTitle title="ThankYou Page">
+              <PageTitle title="ThankYou">
                 <ThankYou />
+              </PageTitle>
+            }
+          />
+
+          <Route
+            path="/wishlist"
+            element={
+              <PageTitle title="Wishlist">
+                <Wishlist />
               </PageTitle>
             }
           />
