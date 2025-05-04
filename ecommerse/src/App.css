@@ -11,3 +11,15 @@
 .animate-spin-slow {
       animation: spin-slow 2s linear infinite;
 }
+
+/* You can include this in a global CSS or your Tailwind config */
+.hide-scrollbar::-webkit-scrollbar {
+      display: none;
+}
+
+.hide-scrollbar {
+      -ms-overflow-style: none;
+      /* IE and Edge */
+      scrollbar-width: none;
+      /* Firefox */
+}
