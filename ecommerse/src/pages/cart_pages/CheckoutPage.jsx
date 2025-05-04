@@ -156,7 +156,7 @@ const CheckoutPage = () => {
     }
 
     try {
-      if (!savedBillingAddress) {
+      if (isLoggedIn && !savedBillingAddress) {
         await axios.post(
           `${globalBackendRoute}/api/add-address`,
           { ...billing, type: "billing" },
@@ -168,7 +168,7 @@ const CheckoutPage = () => {
         );
       }
 
-      if (!sameAsBilling && savedShippingAddresses.length === 0) {
+      if (isLoggedIn && !sameAsBilling && savedShippingAddresses.length === 0) {
         await axios.post(
           `${globalBackendRoute}/api/add-address`,
           { ...shipping, type: "shipping" },
@@ -189,11 +189,13 @@ const CheckoutPage = () => {
           totalAmount,
           userId: isLoggedIn ? user._id : null,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+        isLoggedIn
+          ? {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          : {}
       );
 
       toast.success("Order placed successfully!");

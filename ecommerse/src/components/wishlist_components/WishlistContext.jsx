@@ -53,23 +53,27 @@ export const WishlistProvider = ({ children }) => {
   };
 
   // Add to wishlist
-  const addToWishlist = async (productId, productDetails = null) => {
+  const addToWishlist = async (productId) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(
+      const token = localStorage.getItem("token"); // 🔥 MISSING earlier
+      const res = await axios.post(
         `${globalBackendRoute}/api/wishlist/add-to-wishlist`,
         { productId },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
-      if (productDetails) addItemToLocalWishlist(productDetails);
-      return true;
-    } catch (err) {
-      if (err.response?.status === 403) {
-        console.warn("Unauthorized add to wishlist attempt.");
+
+      await fetchWishlist(); // Refresh the wishlist
+    } catch (error) {
+      if (error.response?.status === 409) {
+        toast.info("Item already in wishlist");
+      } else if (error.response?.status === 401) {
+        toast.error("Please login to use wishlist");
       } else {
-        console.error("Add to wishlist error:", err);
+        toast.error("Failed to add to wishlist");
       }
-      return false;
+      console.error("Add to wishlist error:", error);
     }
   };
 

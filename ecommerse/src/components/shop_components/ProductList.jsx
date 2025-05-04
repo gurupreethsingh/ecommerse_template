@@ -3,6 +3,7 @@ import { FaHeart, FaRupeeSign } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import globalBackendRoute from "../../config/Config";
+import { GetBadges } from "../common_components/getBadges";
 
 const ProductList = ({
   products,
@@ -15,8 +16,6 @@ const ProductList = ({
   const handleCardClick = (id) => {
     navigate(`/single-product/${id}`);
   };
-
-  const isInWishlist = (productId) => wishlist?.includes(productId) || false;
 
   const getImageUrl = (img) => {
     if (img) {
@@ -51,7 +50,9 @@ const ProductList = ({
           >
             <FaHeart
               className={`w-5 h-5 ${
-                isInWishlist(product._id) ? "text-red-500" : "text-gray-400"
+                (wishlist || []).includes(product._id)
+                  ? "text-red-500"
+                  : "text-gray-400"
               } transition`}
             />
           </button>
@@ -69,7 +70,7 @@ const ProductList = ({
             />
           </div>
 
-          {/* Info Section */}
+          {/* Info */}
           <div
             onClick={() => handleCardClick(product._id)}
             className="flex flex-col justify-center md:ml-6 mt-4 md:mt-0 w-full cursor-pointer"
@@ -86,14 +87,14 @@ const ProductList = ({
                 <FaRupeeSign /> {product.selling_price}
               </span>
               {product.display_price && (
-                <span className="text-gray-400 line-through flex items-center text-sm">
+                <span className="text-red-400 line-through flex items-center text-sm">
                   <FaRupeeSign /> {product.display_price}
                 </span>
               )}
             </div>
           </div>
 
-          {/* Add to Cart Button */}
+          {/* Add to Cart */}
           <div className="flex-shrink-0 md:ml-6 mt-4 md:mt-0">
             <button
               onClick={(e) => {

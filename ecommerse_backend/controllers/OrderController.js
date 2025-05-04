@@ -4,16 +4,15 @@ const Order = require("../models/OrderModel");
 // ✅ Use req.user.id instead of req.body.userId
 exports.placeOrder = async (req, res) => {
   try {
-    const { billingAddress, shippingAddress, items, totalAmount } = req.body;
+    const { billingAddress, shippingAddress, items, totalAmount, userId } =
+      req.body;
 
     if (!billingAddress || !shippingAddress || !items || items.length === 0) {
       return res.status(400).json({ message: "Missing order information" });
     }
 
     const newOrder = new Order({
-      user: req.user ? req.user._id || req.user.id : null,
-
-      // ✅ Use authenticated user if available
+      user: userId || null, // ✅ If user is logged in, use passed ID; else null for guests
       billingAddress,
       shippingAddress,
       items,

@@ -63,11 +63,11 @@ const Wishlist = () => {
           <p>Your wishlist is empty.</p>
         </motion.div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {wishlistItems.map((item) => (
             <motion.div
               key={item._id}
-              className="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 p-4 relative"
+              className="bg-white rounded shadow-lg hover:shadow-xl transition duration-300 p-4 relative"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.4 }}
@@ -82,11 +82,11 @@ const Wishlist = () => {
                 <h2 className="text-lg font-semibold text-gray-900 truncate">
                   {item.product_name}
                 </h2>
-                <p className="text-green-600 font-bold mt-1 text-base">
+                <p className="text-green-600 font-bold mt-1 text-xl">
                   ₹{item.selling_price}
                 </p>
                 {item.display_price && (
-                  <p className="text-sm text-gray-400 line-through">
+                  <p className="text-sm text-red-400 line-through">
                     ₹{item.display_price}
                   </p>
                 )}

@@ -3,6 +3,7 @@ import { FaHeart, FaRupeeSign } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import globalBackendRoute from "../../config/Config";
+import { GetBadges } from "../common_components/getBadges";
 
 const ProductCard = ({
   products,
@@ -15,8 +16,6 @@ const ProductCard = ({
   const handleCardClick = (id) => {
     navigate(`/single-product/${id}`);
   };
-
-  const isInWishlist = (productId) => wishlist?.includes(productId) || false;
 
   const getImageUrl = (img) => {
     if (img) {
@@ -39,24 +38,28 @@ const ProductCard = ({
         <motion.div
           key={product._id}
           whileHover={{ scale: 1.04 }}
-          className="relative  group rounded-xl shadow-sm hover:shadow-xl bg-white border border-red-100 overflow-hidden transition duration-300"
+          className="relative group rounded-xl shadow-sm hover:shadow-xl bg-white border border-red-100 overflow-hidden transition duration-300"
         >
-          {/* Wishlist */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggleWishlist(product);
-            }}
-            className="absolute top-4 right-4 bg-white p-2 rounded-full shadow hover:bg-red-100 transition"
-          >
-            <FaHeart
-              className={`w-5 h-5 ${
-                isInWishlist(product._id) ? "text-red-500" : "text-gray-400"
-              } transition-transform duration-300`}
-            />
-          </button>
+          {/* Wishlist Icon */}
+          <div className="absolute top-4 right-4 z-20">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleWishlist(product);
+              }}
+              className="bg-white p-2 rounded-full shadow hover:bg-red-100 transition"
+            >
+              <FaHeart
+                className={`w-5 h-5 ${
+                  (wishlist || []).includes(product._id)
+                    ? "text-red-500"
+                    : "text-gray-400"
+                } transition-transform duration-300`}
+              />
+            </button>
+          </div>
 
-          {/* Image */}
+          {/* Image Section */}
           <div
             className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer"
             onClick={() => handleCardClick(product._id)}
@@ -69,7 +72,7 @@ const ProductCard = ({
             />
           </div>
 
-          {/* Info */}
+          {/* Info Section */}
           <div
             onClick={() => handleCardClick(product._id)}
             className="p-4 space-y-2 cursor-pointer"
@@ -86,7 +89,7 @@ const ProductCard = ({
                 <FaRupeeSign /> {product.selling_price}
               </span>
               {product.display_price && (
-                <span className="text-gray-400 line-through text-sm flex items-center">
+                <span className="text-red-400 line-through text-sm flex items-center">
                   <FaRupeeSign /> {product.display_price}
                 </span>
               )}
