@@ -23,6 +23,13 @@ const CheckoutPage = () => {
   const { isLoggedIn, user } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  // At the top
+  const [guestInfo, setGuestInfo] = useState({
+    guestName: "",
+    guestEmail: "",
+    guestPhone: "",
+  });
+
   const [billing, setBilling] = useState({
     addressLine1: "",
     addressLine2: "",

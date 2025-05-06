@@ -37,6 +37,11 @@ const orderSchema = new mongoose.Schema(
       enum: ["Processing", "Shipped", "Delivered", "Cancelled"],
       default: "Processing",
     },
+
+    // 🆕 Guest Info Fields
+    guestName: { type: String }, // Optional
+    guestEmail: { type: String },
+    guestPhone: { type: String },
   },
   { timestamps: true }
 );

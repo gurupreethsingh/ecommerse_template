@@ -52,6 +52,49 @@ exports.addAddress = async (req, res) => {
   }
 };
 
+// Add a new address for a guest user
+exports.addGuestAddress = async (req, res) => {
+  try {
+    const {
+      type,
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+      postalCode,
+      country,
+      guestName,
+      guestEmail,
+      guestPhone,
+    } = req.body;
+
+    // Validate required guest fields
+    if (!guestName || !guestEmail || !guestPhone) {
+      return res
+        .status(400)
+        .json({ message: "Guest name, email, and phone are required." });
+    }
+
+    const newAddress = new Address({
+      type,
+      addressLine1,
+      addressLine2,
+      city,
+      state,
+      postalCode,
+      country,
+      guestName,
+      guestEmail,
+      guestPhone,
+    });
+
+    await newAddress.save();
+    res.status(201).json(newAddress);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 // Update an existing address
 exports.updateAddress = async (req, res) => {
   try {

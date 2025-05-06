@@ -5,6 +5,7 @@ const addressController = require("../controllers/AddressController");
 const { verifyToken } = require("../middleware/AuthMiddleware");
 
 router.get("/get-addresses", verifyToken, addressController.getAddresses);
+router.post("/add-guest-address", addressController.addGuestAddress);
 router.post("/add-address", verifyToken, addressController.addAddress);
 router.put(
   "/update-addreess/:id",

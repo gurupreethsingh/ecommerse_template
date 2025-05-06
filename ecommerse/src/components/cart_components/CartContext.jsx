@@ -766,6 +766,7 @@ export const CartProvider = ({ children }) => {
 
   const resetCartState = () => {
     setCartItems([]);
+    localStorage.removeItem("cartItems");
   };
 
   return (
