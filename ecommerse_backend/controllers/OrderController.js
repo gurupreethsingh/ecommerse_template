@@ -12,7 +12,7 @@ exports.placeOrder = async (req, res) => {
     }
 
     const newOrder = new Order({
-      user: userId || null, // ✅ If user is logged in, use passed ID; else null for guests
+      user: req.user?.id || null, // ✅ If user is logged in, use passed ID; else null for guests
       billingAddress,
       shippingAddress,
       items,

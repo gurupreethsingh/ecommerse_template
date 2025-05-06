@@ -194,7 +194,7 @@ const CheckoutPage = () => {
           shippingAddress: finalShipping,
           items: cartItems,
           totalAmount,
-          userId: isLoggedIn ? user._id : null,
+          // userId: isLoggedIn ? user._id : null,
         },
         isLoggedIn
           ? {
