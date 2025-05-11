@@ -102,7 +102,9 @@ const MainLayout = () => {
             path="/all-messages"
             element={
               <PrivateRoute allowedRoles={["superadmin"]}>
-                <AllMessages />
+                <PageTitle title="All-messages">
+                  <AllMessages />
+                </PageTitle>
               </PrivateRoute>
             }
           />
@@ -110,7 +112,9 @@ const MainLayout = () => {
             path="/reply-message/:id"
             element={
               <PrivateRoute allowedRoles={["superadmin"]}>
-                <ReplyMessage />
+                <PageTitle title="Reply-message">
+                  <ReplyMessage />
+                </PageTitle>
               </PrivateRoute>
             }
           />
@@ -119,7 +123,9 @@ const MainLayout = () => {
             path="/all-replies"
             element={
               <PrivateRoute allowedRoles={["superadmin"]}>
-                <AllReplies />
+                <PageTitle title="All-replies">
+                  <AllReplies />
+                </PageTitle>
               </PrivateRoute>
             }
           />
@@ -166,9 +172,23 @@ const MainLayout = () => {
             }
           />
 
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route
+            path="/forgot-password"
+            element={
+              <PageTitle title="User Dashboard">
+                <ForgotPassword />
+              </PageTitle>
+            }
+          />
 
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route
+            path="/reset-password"
+            element={
+              <PageTitle title="User Dashboard">
+                <ResetPassword />
+              </PageTitle>
+            }
+          />
 
           <Route
             path="/superadmin-dashboard"

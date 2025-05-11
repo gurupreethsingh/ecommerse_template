@@ -120,13 +120,41 @@ const MainLayout = () => {
             }
           />
 
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route
+            path="/forgot-password"
+            element={
+              <PageTitle title="Forgot Password">
+                <ForgotPassword />
+              </PageTitle>
+            }
+          />
 
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route
+            path="/reset-password"
+            element={
+              <PageTitle title="Forgot Password">
+                <ResetPassword />
+              </PageTitle>
+            }
+          />
 
-          <Route path="/shop" element={<Shop />} />
+          <Route
+            path="/shop"
+            element={
+              <PageTitle title="Shop">
+                <Shop />
+              </PageTitle>
+            }
+          />
 
-          <Route path="/single-product/:id" element={<SingleProduct />} />
+          <Route
+            path="/single-product/:id"
+            element={
+              <PageTitle title="Single-Product">
+                <SingleProduct />
+              </PageTitle>
+            }
+          />
 
           <Route
             path="/profile/:id"
@@ -172,7 +200,7 @@ const MainLayout = () => {
           <Route
             path="/search-products"
             element={
-              <PageTitle title="Search Products">
+              <PageTitle title="Search-Products">
                 <SearchProducts />
               </PageTitle>
             }
