@@ -1,0 +1,131 @@
+---
+
+## ✅ FLOW DIAGRAM (Architecture)
+
+```
+[User Browser]
+      |
+      V
+[React Frontend (Shop, Cart, Auth, Admin Panel)]
+      |
+      V
+[Node.js Express API]
+      |
+      V
+[MongoDB Database]
+      |
+      V
+[External Services]
+  ├── [Payment Gateway (Razorpay/Stripe)]
+  ├── [Email Service (Nodemailer/SMTP)]
+  ├── [Cloud Storage (e.g., Cloudinary/S3)]
+```
+
+---
+
+## 📘 PROJECT DOCUMENTATION
+
+### 📌 1. Project Title
+
+**Modern MERN Stack eCommerce Website**
+
+---
+
+### 📌 2. Abstract
+
+This project is a full-stack eCommerce platform built using **MongoDB, Express.js, React.js, and Node.js (MERN)**. It supports core functionalities like user authentication, product listings, shopping cart, checkout, order tracking, payment integration, and an admin panel for managing the store. The platform is optimized for mobile, SEO, performance, and security.
+
+---
+
+### 📌 3. System Architecture & Module Overview
+
+| Module             | Technologies Used          | Description                                |
+| ------------------ | -------------------------- | ------------------------------------------ |
+| **Frontend**       | React, Tailwind CSS, Axios | UI/UX layer for users and admins           |
+| **Backend**        | Node.js, Express.js        | RESTful APIs for all features              |
+| **Database**       | MongoDB, Mongoose          | Stores all persistent data                 |
+| **Authentication** | JWT, Bcrypt                | Secure login, register, session management |
+| **File Upload**    | Multer, Cloudinary         | Product image upload system                |
+| **Payment**        | Stripe/Razorpay API        | Handles secure payment transactions        |
+| **Email Service**  | Nodemailer                 | Sends order confirmation and notifications |
+
+---
+
+### 📌 4. Core Features
+
+#### 🛍️ User-Side
+
+* Register/Login/Logout (with JWT)
+* Product browsing with filters (category, price, brand)
+* Product details and reviews
+* Add to Cart / Buy Now
+* Wishlist and Save for Later
+* Checkout with address selection
+* Payment gateway integration
+* View orders, track delivery
+
+#### 🛠️ Admin Panel
+
+* Manage Products (CRUD)
+* Manage Categories & Brands
+* Order management
+* View Sales & Revenue
+* Manage Users & Roles
+
+---
+
+### 📌 5. Database Models (Simplified)
+
+* **User**: name, email, password, role, addresses, wishlist
+* **Product**: name, price, description, category, brand, stock, images, ratings
+* **Order**: userId, items, total, shippingAddress, status, paymentInfo
+* **Category**: name, slug
+* **Review**: productId, userId, rating, comment
+
+---
+
+### 📌 6. Tech Stack Summary
+
+| Layer      | Technology                                     |
+| ---------- | ---------------------------------------------- |
+| Frontend   | React, Tailwind CSS                            |
+| Backend    | Node.js, Express.js                            |
+| Database   | MongoDB + Mongoose                             |
+| Storage    | Cloudinary                                     |
+| Auth       | JWT + Bcrypt                                   |
+| Payment    | Stripe or Razorpay                             |
+| Email      | Nodemailer                                     |
+| Deployment | Vercel (Frontend), Render or Railway (Backend) |
+
+---
+
+### 📌 7. Security Measures
+
+* HTTPS & CORS configuration
+* JWT authentication
+* Encrypted passwords with Bcrypt
+* Role-based access control
+* Input validation & sanitization
+
+---
+
+### 📌 8. Future Enhancements
+
+* AI-based product recommendation
+* PWA support
+* Live chat support
+* Inventory management automation
+* Multiple payment options
+
+---
+
+### 📌 9. Screenshots (Recommended for Presentation)
+
+* Homepage
+* Product Listing
+* Product Detail
+* Cart Page
+* Checkout Page
+* Admin Dashboard
+
+---
