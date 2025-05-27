@@ -1,5 +1,5 @@
 backend libraries. 
-express nodemon cors dotenv jsonwebtoken bcrypt fs path multer nodemailer
+express nodemon cors dotenv jsonwebtoken bcrypt fs path multer nodemailer jsonify nodemon
 
 front end libraries : 
 react-router-dom, react-icons , axios, jwt-decode
