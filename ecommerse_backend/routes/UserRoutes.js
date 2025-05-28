@@ -25,6 +25,7 @@ const storage = multer.diskStorage({
     try {
       const user = await User.findById(req.params.id);
       const role = user?.role || "others";
+      
       const uploadFolder = path.join("uploads", role);
 
       if (!fs.existsSync(uploadFolder)) {

@@ -11,9 +11,7 @@ if (!fs.existsSync(productUploadDir)) {
 }
 
 const productStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, productUploadDir);
-  },
+  destination: (req, file, cb) => {    cb(null, productUploadDir);  },
   filename: (req, file, cb) => {
     const filename = `${file.fieldname}-${Date.now()}${path.extname(
       file.originalname
@@ -92,10 +90,8 @@ exports.createProduct = async (req, res) => {
       admin_notes,
     } = req.body;
 
-    const mainImage =
-      req.files["product_image"]?.[0]?.path.replace(/\\/g, "/") || "";
-    const galleryImages =
-      req.files["all_product_images"]?.map((f) => f.path.replace(/\\/g, "/")) ||
+    const mainImage =      req.files["product_image"]?.[0]?.path.replace(/\\/g, "/") || "";
+    const galleryImages =      req.files["all_product_images"]?.map((f) => f.path.replace(/\\/g, "/")) ||
       [];
 
     const newProduct = new Product({

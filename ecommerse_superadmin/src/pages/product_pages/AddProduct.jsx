@@ -321,30 +321,23 @@ export default function AddProduct() {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Main Product Image *
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setProductImage(e.target.files[0])}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300"
-          />
-        </div>
+ <input
+  type="file"
+  name="product_image"  // ✅ Important
+  accept="image/*"
+  onChange={(e) => setProductImage(e.target.files[0])}
+  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300"
+/>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Gallery Images
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => setGalleryImages([...e.target.files])}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300"
-          />
-        </div>
+<input
+  type="file"
+  name="all_product_images"  // ✅ Important
+  accept="image/*"
+  multiple
+  onChange={(e) => setGalleryImages([...e.target.files])}
+  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300"
+/>
+
 
         <button
           type="submit"
