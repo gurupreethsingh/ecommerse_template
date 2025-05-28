@@ -4,10 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
-const jwt = require("jsonwebtoken"); // For token verification
 const path = require("path");
-const fs = require("fs");
-const bcrypt = require("bcrypt");
 
 const userRoutes = require("./routes/UserRoutes");
 const activityRoutes = require("./routes/ActivityRoutes");

@@ -90,11 +90,9 @@ const MainLayout = () => {
           <Route
             path="/contact-us"
             element={
-              <PublicRoute>
-                <PageTitle title="Contact Us">
-                  <ContactUs />
-                </PageTitle>
-              </PublicRoute>
+              <PageTitle title="Contact Us">
+                <ContactUs />
+              </PageTitle>
             }
           />
 
